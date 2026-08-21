@@ -235,6 +235,16 @@
   .ac-item:first-child { border-top: none; }
   .ac-item .ac-sub { color: var(--ink-muted); font-size: 12px; }
   .ac-item:active { background: var(--surface-2); }
+
+  .photo-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .photo-cell { position: relative; width: 78px; height: 78px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+  .photo-cell img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo-remove {
+    position: absolute; top: 3px; right: 3px; width: 20px; height: 20px; border-radius: 50%;
+    border: none; background: rgba(0,0,0,0.62); color: #fff; font-size: 13px; line-height: 1; cursor: pointer;
+  }
+  .detail-photos { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .detail-photo-thumb { width: 68px; height: 68px; object-fit: cover; border-radius: 9px; border: 1px solid var(--border); display: block; }
 </style>
 </head>
 <body>
@@ -297,6 +307,14 @@
       <section class="card">
         <h2>Kontrol Listesi</h2>
         <div id="checklist"></div>
+      </section>
+
+      <section class="card">
+        <h2>Fotoğraflar</h2>
+        <div class="photo-grid" id="photoGrid"></div>
+        <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none;">
+        <button type="button" class="btn" id="addPhotoBtn">+ Fotoğraf Ekle</button>
+        <p class="hint" id="photoHint">Mağaza adı ve tarih fotoğrafın üzerine otomatik eklenir</p>
       </section>
 
       <section class="card">
@@ -521,11 +539,107 @@ function freshFormState() {
     temsilci: settings.defaultTemsilci || "",
     yetkili: "",
     answers,
+    photos: [],
     genelNot: "",
     aksiyonGerekli: "Hayır",
     aksiyonKim: "",
     aksiyonTarih: "",
   };
+}
+
+/* ---------------- Photos ---------------- */
+const MAX_PHOTOS = 10;
+
+function compressImage(file, maxDim, quality, label) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("read failed"));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("decode failed"));
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > h && w > maxDim) { h = Math.round(h * (maxDim / w)); w = maxDim; }
+        else if (h > maxDim) { w = Math.round(w * (maxDim / h)); h = maxDim; }
+        const canvas = document.createElement("canvas");
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, w, h);
+        if (label) drawWatermark(ctx, w, h, label);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function drawWatermark(ctx, w, h, label) {
+  const barH = Math.max(28, Math.round(h * 0.09));
+  const grad = ctx.createLinearGradient(0, h - barH, 0, h);
+  grad.addColorStop(0, "rgba(0,0,0,0)");
+  grad.addColorStop(1, "rgba(0,0,0,0.68)");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, h - barH, w, barH);
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "600 " + Math.max(12, Math.round(barH * 0.4)) + "px Arial, sans-serif";
+  ctx.textBaseline = "middle";
+  ctx.fillText(label, 10, h - barH / 2, w - 20);
+}
+
+function renderPhotoGrid() {
+  const grid = document.getElementById("photoGrid");
+  grid.innerHTML = "";
+  formState.photos.forEach((p, i) => {
+    const cell = document.createElement("div");
+    cell.className = "photo-cell";
+    const img = document.createElement("img");
+    img.src = p.data || p.url;
+    const rm = document.createElement("button");
+    rm.type = "button";
+    rm.className = "photo-remove";
+    rm.textContent = "×";
+    rm.addEventListener("click", () => {
+      formState.photos.splice(i, 1);
+      renderPhotoGrid();
+      updatePhotoHint();
+    });
+    cell.appendChild(img);
+    cell.appendChild(rm);
+    grid.appendChild(cell);
+  });
+}
+
+function updatePhotoHint() {
+  const btn = document.getElementById("addPhotoBtn");
+  const hint = document.getElementById("photoHint");
+  const full = formState.photos.length >= MAX_PHOTOS;
+  btn.style.display = full ? "none" : "block";
+  hint.textContent = full
+    ? MAX_PHOTOS + "/" + MAX_PHOTOS + " fotoğraf eklendi"
+    : "Mağaza adı ve tarih fotoğrafın üzerine otomatik eklenir";
+}
+
+function bindPhotoInputs() {
+  document.getElementById("addPhotoBtn").addEventListener("click", () => {
+    if (!formState.magaza.trim()) { showToast("Önce mağaza adını girin"); return; }
+    document.getElementById("photoInput").click();
+  });
+  document.getElementById("photoInput").addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    if (formState.photos.length >= MAX_PHOTOS) return;
+    const label = [formState.magaza, formState.tarih ? fmtDate(formState.tarih) : ""].filter(Boolean).join(" · ");
+    try {
+      const dataUri = await compressImage(file, 1000, 0.65, label);
+      formState.photos.push({ data: dataUri, url: null });
+      renderPhotoGrid();
+      updatePhotoHint();
+    } catch (err) {
+      showToast("Fotoğraf işlenemedi");
+    }
+  });
 }
 
 function recomputeSehir() {
@@ -681,6 +795,8 @@ function loadFormIntoInputs() {
   renderKanalPills();
   renderChecklist();
   renderAksiyonPills();
+  renderPhotoGrid();
+  updatePhotoHint();
 }
 
 function resetForm() {
@@ -705,6 +821,7 @@ function startEdit(id) {
     temsilci: v.temsilci,
     yetkili: v.yetkili,
     answers: Object.assign({}, v.answers),
+    photos: (v.photos || []).map((p) => Object.assign({}, p)),
     genelNot: v.genelNot,
     aksiyonGerekli: v.aksiyonGerekli,
     aksiyonKim: v.aksiyonKim,
@@ -813,13 +930,31 @@ async function trySyncOne(id) {
   const record = visits[idx];
   if (record.synced) return;
   try {
-    const payload = Object.assign({}, record, { action: record.syncAction || "create" });
+    const pendingPhotoIdx = [];
+    const photosToSend = [];
+    (record.photos || []).forEach((p, i) => {
+      if (p.data) { pendingPhotoIdx.push(i); photosToSend.push(p.data); }
+    });
+    const payload = Object.assign({}, record, {
+      action: record.syncAction || "create",
+      photos: photosToSend,
+    });
     const res = await fetch(settings.syncUrl, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error("HTTP " + res.status);
+    const json = await res.json().catch(() => ({}));
+    if (json.photoUrls && json.photoUrls.length) {
+      json.photoUrls.forEach((url, i) => {
+        const targetIdx = pendingPhotoIdx[i];
+        if (targetIdx != null && record.photos[targetIdx] && url) {
+          record.photos[targetIdx].url = url;
+          record.photos[targetIdx].data = null;
+        }
+      });
+    }
     record.synced = true;
     visits[idx] = record;
     setVisits(visits);
@@ -956,6 +1091,7 @@ function renderHistory() {
       <div class="row2">
         <span class="badge ${v.synced ? "ok" : "neutral"}">${v.synced ? "Senkronize" : "Bekliyor"}</span>
         ${v.aksiyonGerekli === "Evet" ? '<span class="badge warn">Takip gerekiyor</span>' : ""}
+        ${v.photos && v.photos.length ? `<span class="badge neutral">📷 ${v.photos.length}</span>` : ""}
       </div>
       <div class="visit-detail" id="detail-${v.id}"></div>
     `;
@@ -994,12 +1130,18 @@ function renderDetailHtml(v) {
   const konum = (v.lat != null && v.lng != null)
     ? `<div class="di-row"><span class="di-label">Konum</span><span class="di-val"><a href="https://maps.google.com/?q=${v.lat},${v.lng}" target="_blank" rel="noopener" style="color:inherit;">Haritada gör</a></span></div>`
     : "";
+  const fotograflar = (v.photos && v.photos.length)
+    ? `<div class="detail-photos">` + v.photos.map((p) => {
+        const src = p.data || p.url;
+        return src ? `<a href="${src}" target="_blank" rel="noopener"><img class="detail-photo-thumb" src="${src}"></a>` : "";
+      }).join("") + `</div>`
+    : "";
   const actions = `
     <div class="detail-actions">
       <button type="button" class="btn" data-act="edit" data-id="${v.id}">Düzenle</button>
       <button type="button" class="btn danger" data-act="delete" data-id="${v.id}">Sil</button>
     </div>`;
-  return `<div class="di-row"><span class="di-label">Saha Temsilcisi</span><span class="di-val">${escapeHtml(v.temsilci || "-")}</span></div>${yetkili}${rows}${aksiyon}${notes}${konum}${actions}`;
+  return `<div class="di-row"><span class="di-label">Saha Temsilcisi</span><span class="di-val">${escapeHtml(v.temsilci || "-")}</span></div>${yetkili}${rows}${aksiyon}${notes}${konum}${fotograflar}${actions}`;
 }
 
 function escapeHtml(s) {
@@ -1089,6 +1231,7 @@ document.getElementById("s_clearBtn").addEventListener("click", () => {
 window.addEventListener("online", () => { syncAllPending(); });
 
 bindFormInputs();
+bindPhotoInputs();
 resetForm();
 updateSyncPill();
 
