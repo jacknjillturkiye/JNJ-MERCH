@@ -214,6 +214,27 @@
   }
   .toast.show { opacity: 1; }
   .hint { font-size: 11.5px; color: var(--ink-muted); margin-top: 6px; }
+
+  .edit-banner {
+    display: none; align-items: center; justify-content: space-between; gap: 10px;
+    background: var(--warning-soft); color: var(--warning-ink); border-radius: 10px;
+    padding: 10px 12px; margin-bottom: 12px; font-size: 13px; font-weight: 600;
+  }
+  .edit-banner button { background: none; border: none; color: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; padding: 0; font-size: 13px; }
+  .detail-actions { display: flex; gap: 8px; margin-top: 14px; }
+  .detail-actions .btn { flex: 1; }
+
+  .ac-wrap { position: relative; }
+  .ac-panel {
+    display: none; position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 30;
+    background: var(--surface); border: 1px solid var(--border-strong); border-radius: 10px;
+    box-shadow: var(--shadow); max-height: 240px; overflow-y: auto;
+  }
+  .ac-panel.show { display: block; }
+  .ac-item { padding: 10px 12px; font-size: 14px; cursor: pointer; border-top: 1px solid var(--border); }
+  .ac-item:first-child { border-top: none; }
+  .ac-item .ac-sub { color: var(--ink-muted); font-size: 12px; }
+  .ac-item:active { background: var(--surface-2); }
 </style>
 </head>
 <body>
@@ -234,19 +255,30 @@
 
     <!-- ================= YENİ ZİYARET ================= -->
     <div class="view active" id="view-form">
+      <div class="edit-banner" id="editBanner">
+        <span id="editBannerText"></span>
+        <button type="button" onclick="cancelEdit()">İptal</button>
+      </div>
       <section class="card">
         <h2>Ziyaret Bilgileri</h2>
         <div class="field">
           <label>Kanal</label>
           <div class="pillrow" id="kanalPills"></div>
         </div>
-        <div class="field">
+        <div class="field ac-wrap">
           <label for="f_magaza">Mağaza Adı</label>
-          <input type="text" id="f_magaza" placeholder="Örn. Macrocenter Bağdat Cad.">
+          <input type="text" id="f_magaza" autocomplete="off" placeholder="Yazmaya başlayın...">
+          <div class="ac-panel" id="ac_magaza"></div>
         </div>
-        <div class="field">
-          <label for="f_sehir">Şehir / Bölge</label>
-          <input type="text" id="f_sehir">
+        <div class="field ac-wrap">
+          <label for="f_il">İl</label>
+          <input type="text" id="f_il" autocomplete="off" placeholder="İl seçin veya yazın">
+          <div class="ac-panel" id="ac_il"></div>
+        </div>
+        <div class="field ac-wrap">
+          <label for="f_ilce">İlçe</label>
+          <input type="text" id="f_ilce" autocomplete="off" placeholder="Önce il seçin">
+          <div class="ac-panel" id="ac_ilce"></div>
         </div>
         <div class="field">
           <label for="f_tarih">Tarih</label>
@@ -418,6 +450,11 @@ const CATEGORIES = [
 const ALL_ITEMS = CATEGORIES.flatMap((c) => c.items);
 const KANALLAR = ["Macrocenter", "Eczane", "Bebek Marketi", "Diğer"];
 
+const MACROCENTER_STORES = [{"name":"A.konutları Şişli Macrocenter","il":"İstanbul"},{"name":"Acarkent Macrocenter","il":"İstanbul"},{"name":"Acıbadem İstanbul Macrocenter","il":"İstanbul"},{"name":"Agora Avm İzmir Macrocenter","il":"İzmir"},{"name":"Akasya İstanbul Macrocenter","il":"İstanbul"},{"name":"Akmerkez Macrocenter","il":"İstanbul"},{"name":"Akyarlar Bodrum Macrocenter S","il":"Muğla"},{"name":"Alacaatlı Çayyolu Macrocenter","il":"Ankara"},{"name":"Alaçatı Macrocenter S","il":"İzmir"},{"name":"Alaçatı Çeşme Macrocenter","il":"İzmir"},{"name":"Alkent Macrocenter","il":"İstanbul"},{"name":"Alleben Gaziantep Macrocenter","il":"Gaziantep"},{"name":"Alsancak Macrocenter","il":"İzmir"},{"name":"Altınoluk Macrocenter","il":"Balıkesir"},{"name":"Altınova Macrocenter","il":"Balıkesir"},{"name":"Aqua Florya Macrocenter","il":"İstanbul"},{"name":"Arcadium Ankara Macrocenter","il":"Ankara"},{"name":"Aspat Bodrum Macrocenter S","il":"Muğla"},{"name":"Atakule Macrocenter","il":"Ankara"},{"name":"Atakum Macrocenter","il":"Samsun"},{"name":"Ataköy Suit Macrocenter","il":"İstanbul"},{"name":"Atatürk Blv Didim Macrocenter","il":"Aydın"},{"name":"Ataşehir Wynhouse Macrocenter","il":"İstanbul"},{"name":"Ayvalık Macrocenter","il":"Balıkesir"},{"name":"B.evler 7.cd Macrocenter S","il":"Ankara"},{"name":"Bebek Macrocenter S","il":"İstanbul"},{"name":"Beysukent Macrocenter","il":"Ankara"},{"name":"Bitez Muğla Macrocenter","il":"Muğla"},{"name":"Bodrum Küçükbük Macrocenter","il":"Muğla"},{"name":"Bodrum Çamlık Macrocenter","il":"Muğla"},{"name":"Bornova Macrocenter","il":"İzmir"},{"name":"Bostanlı Macrocenter","il":"İzmir"},{"name":"Brand Atakent Macrocenter","il":"İstanbul"},{"name":"Brandium Ataşehir Macrocenter","il":"İstanbul"},{"name":"Brandvadi İstanbul Macrocenter","il":"İstanbul"},{"name":"Bulvar Beytepe Macrocenter","il":"Ankara"},{"name":"Bursa Balat Macrocenter","il":"Bursa"},{"name":"Cemil Topuzlu Macrocenter","il":"İstanbul"},{"name":"City`s Nişantaşı Macrocenter","il":"İstanbul"},{"name":"D-marin Didim Macrocenter","il":"Aydın"},{"name":"D-marin Göcek Macrocenter S","il":"Muğla"},{"name":"D-marin Turgutreis Macrocenter","il":"Muğla"},{"name":"Dalyan Çeşme Macrocenter","il":"İzmir"},{"name":"Demirlife Hadımköy Macrocenter","il":"İstanbul"},{"name":"Downtown Alanya Macrocenter","il":"Antalya"},{"name":"Effect Macrocenter","il":"Ankara"},{"name":"Erenköy Kadıköy Macrocenter","il":"İstanbul"},{"name":"Eskişehir Macrocenter","il":"Eskişehir"},{"name":"Evka 3 Bornova İzm Macrocenter","il":"İzmir"},{"name":"F.ayanoğlu Kadıköy Macrocenter","il":"İstanbul"},{"name":"Fethiye Muğla Macrocenter","il":"Muğla"},{"name":"Filistin Cd Ank Macrocenter S","il":"Ankara"},{"name":"Fulya Beşiktaş Macrocenter","il":"İstanbul"},{"name":"Galataport Beyoğlu Macrocenter","il":"İstanbul"},{"name":"Gayrettepe İst Macrocenter","il":"İstanbul"},{"name":"Gaziantep Macrocenter","il":"Gaziantep"},{"name":"Gop Uğur Mumcu Macrocenter","il":"Ankara"},{"name":"Grandpera Macrocenter S","il":"İstanbul"},{"name":"Göcek Macrocenter","il":"Muğla"},{"name":"Göktürk Macrocenter","il":"İstanbul"},{"name":"Güllük Milas Macrocenter S","il":"Muğla"},{"name":"Gümüşsuyu İstanbul Macrocenter","il":"İstanbul"},{"name":"Gündoğan Bodrum Macrocenter","il":"Muğla"},{"name":"Güzelbahçe Sahil Macrocenter","il":"İzmir"},{"name":"Güzelbahçe İzmir Macrocenter","il":"İzmir"},{"name":"Homemade Mobil Macrocenter","il":"İstanbul"},{"name":"K.pınar Diyarbakır Macrocenter","il":"Diyarbakır"},{"name":"Kalkan Kalamar Ant Macrocenter","il":"Antalya"},{"name":"Kanyon Macrocenter","il":"İstanbul"},{"name":"Kaplankaya Macrocenter","il":"Muğla"},{"name":"Karaburun İzmir Macrocenter S","il":"İzmir"},{"name":"Karşıyaka İzmir Macrocenter","il":"İzmir"},{"name":"Kavaklıdere Macrocenter","il":"Ankara"},{"name":"Kaşmir Eryaman Macrocenter S","il":"Ankara"},{"name":"Kemer Antalya Macrocenter","il":"Antalya"},{"name":"Kemer Country Macrocenter","il":"İstanbul"},{"name":"Keptur Döşemealtı Macrocenter","il":"Antalya"},{"name":"Konyaaltı Macrocenter","il":"Antalya"},{"name":"Koru Alacaatlı Macrocenter","il":"Ankara"},{"name":"Kozyatağı Macrocenter","il":"İstanbul"},{"name":"Koşuyolu Macrocenter","il":"İstanbul"},{"name":"Kumru Macrocenter","il":"Ankara"},{"name":"Kuruçeşme Macrocenter","il":"İstanbul"},{"name":"Kuşadası Marina Macrocenter","il":"Aydın"},{"name":"Küçükyalı Hilltown Macrocenter","il":"İstanbul"},{"name":"Lara Macrocenter","il":"Antalya"},{"name":"Liv Bahçeşehir Macrocenter","il":"İstanbul"},{"name":"Lusso Bornova Macrocenter","il":"İzmir"},{"name":"Mahall Bomonti İzm Macrocenter","il":"İzmir"},{"name":"Manavgat Antalya Macrocenter","il":"Antalya"},{"name":"Marin Alaçatı Macrocenter S","il":"İzmir"},{"name":"Marina 24 İstanbul Macrocenter","il":"İstanbul"},{"name":"Marina Mersin Macrocenter","il":"Mersin"},{"name":"Marmaris Marina Macrocenter","il":"Muğla"},{"name":"Marmaris Muğla Macrocenter","il":"Muğla"},{"name":"Mars Kocaeli Macrocenter","il":"Kocaeli"},{"name":"Maslak 1453 Macrocenter","il":"İstanbul"},{"name":"Maslak 42 Macrocenter","il":"İstanbul"},{"name":"Maslak Darkkitchen Macrocenter","il":"İstanbul"},{"name":"Mavibahçe İzmir Macrocenter","il":"İzmir"},{"name":"Maya Milas Macrocenter","il":"Muğla"},{"name":"Menteşe Muğla Macrocenter","il":"Muğla"},{"name":"Metrohome B.düzü Macrocenter","il":"İstanbul"},{"name":"Midtown Avm Bodrum Macrocenter","il":"Muğla"},{"name":"Mogan Gölbaşı Ank Macrocenter","il":"Ankara"},{"name":"Next Level Ankara Macrocenter","il":"Ankara"},{"name":"Nisbetiye On Macrocenter","il":"İstanbul"},{"name":"Nişantaşı Macrocenter","il":"İstanbul"},{"name":"Nokta Ankara Macrocenter","il":"Ankara"},{"name":"Oba Alanya Macrocenter S","il":"Antalya"},{"name":"One Tower Ankara Macrocenter","il":"Ankara"},{"name":"Ormanada Macrocenter","il":"İstanbul"},{"name":"Ormanköy İstanbul Macrocenter","il":"İstanbul"},{"name":"Oyak Dragos İst Macrocenter","il":"İstanbul"},{"name":"Paspatur Fethiye Macrocenter S","il":"Muğla"},{"name":"Piazza Maltepe Macrocenter","il":"İstanbul"},{"name":"Podyumpark Bursa Macrocenter","il":"Bursa"},{"name":"Prıme Avm Manisa Macrocenter","il":"Manisa"},{"name":"Riva İstanbul Macrocenter S","il":"İstanbul"},{"name":"Sahil Kuşadası Macrocenter","il":"Aydın"},{"name":"Saklıvadi İstanbul Macrocenter","il":"İstanbul"},{"name":"Sapanca Macrocenter","il":"Sakarya"},{"name":"Sasalı İzmir Macrocenter","il":"İzmir"},{"name":"Selimiye Macrocenter S","il":"Muğla"},{"name":"Suadıye İstanbul Macrocenter","il":"İstanbul"},{"name":"Tema World Macrocenter","il":"İstanbul"},{"name":"Terra City Antalya Macrocenter","il":"Antalya"},{"name":"Torba Bodrum Macrocenter S","il":"Muğla"},{"name":"Türkbükü Macrocenter","il":"Muğla"},{"name":"U.mumcu Blv Adana Macrocenter","il":"Adana"},{"name":"Uncalı Mh Antalya Macrocenter","il":"Antalya"},{"name":"Unıque Ümitköy Macrocenter S","il":"Ankara"},{"name":"Urla İzmir Macrocenter","il":"İzmir"},{"name":"Vadi İstanbul Macrocenter","il":"İstanbul"},{"name":"Van Macrocenter","il":"Van"},{"name":"Vega Center Ankara Macrocenter","il":"Ankara"},{"name":"Vesen Tuzla İst Macrocenter S","il":"İstanbul"},{"name":"Vitrin Macrocenter","il":"Ankara"},{"name":"Watergarden İst Macrocenter","il":"İstanbul"},{"name":"Yalıkavak Bodrum Macrocenter","il":"Muğla"},{"name":"Yalıkavak Geriş Macrocenter S","il":"Muğla"},{"name":"Yalıkavak Gökçebel Macrocenter","il":"Muğla"},{"name":"Yalıkavak Marina Macrocenter","il":"Muğla"},{"name":"Yaşamkent Macrocenter S","il":"Ankara"},{"name":"Yedimavi İstanbul Macrocenter","il":"İstanbul"},{"name":"Yeniköy Macrocenter","il":"İstanbul"},{"name":"Zekeriyaköy Macrocenter","il":"İstanbul"},{"name":"Zorlu Macrocenter","il":"İstanbul"},{"name":"Çanakkale Macrocenter","il":"Çanakkale"},{"name":"Çekmeköy Kasaba Macrocenter S","il":"İstanbul"},{"name":"Çekmeköy Macrocenter","il":"İstanbul"},{"name":"Çeşme Ardıç Macrocenter","il":"İzmir"},{"name":"Çeşme Ilıca Macrocenter","il":"İzmir"},{"name":"Çeşme Macrocenter","il":"İzmir"},{"name":"Çorlu Önerler Macrocenter","il":"Tekirdağ"},{"name":"Özlüce Nilüfer Macrocenter","il":"Bursa"},{"name":"İstinye Park Macrocenter","il":"İstanbul"},{"name":"İstinyepark İzmir Macrocenter","il":"İzmir"},{"name":"İstmarina Macrocenter","il":"İstanbul"},{"name":"Şile İstanbul Macrocenter","il":"İstanbul"}];
+const IL_LIST = ["İstanbul","Adana","Adıyaman","Afyonkarahisar","Ağrı","Aksaray","Amasya","Ankara","Antalya","Ardahan","Artvin","Aydın","Balıkesir","Bartın","Batman","Bayburt","Bilecik","Bingöl","Bitlis","Bolu","Burdur","Bursa","Çanakkale","Çankırı","Çorum","Denizli","Diyarbakır","Düzce","Edirne","Elazığ","Erzincan","Erzurum","Eskişehir","Gaziantep","Giresun","Gümüşhane","Hakkari","Hatay","Iğdır","Isparta","İzmir","Kahramanmaraş","Karabük","Karaman","Kars","Kastamonu","Kayseri","Kırıkkale","Kırklareli","Kırşehir","Kilis","Kocaeli","Konya","Kütahya","Malatya","Manisa","Mardin","Mersin","Muğla","Muş","Nevşehir","Niğde","Ordu","Osmaniye","Rize","Sakarya","Samsun","Siirt","Sinop","Sivas","Şanlıurfa","Şırnak","Tekirdağ","Tokat","Trabzon","Tunceli","Uşak","Van","Yalova","Yozgat","Zonguldak"];
+const IL_ILCE = {"İstanbul":["Adalar","Arnavutköy","Ataşehir","Avcılar","Bağcılar","Bahçelievler","Bakırköy","Başakşehir","Bayrampaşa","Beşiktaş","Beykoz","Beylikdüzü","Beyoğlu","Büyükçekmece","Çatalca","Çekmeköy","Esenler","Esenyurt","Eyüpsultan","Fatih","Gaziosmanpaşa","Güngören","Kadıköy","Kağıthane","Kartal","Küçükçekmece","Maltepe","Pendik","Sancaktepe","Sarıyer","Silivri","Sultanbeyli","Sultangazi","Şile","Şişli","Tuzla","Ümraniye","Üsküdar","Zeytinburnu"],"Adana":["Aladağ","Ceyhan","Çukurova","Feke","İmamoğlu","Karaisalı","Karataş","Kozan","Pozantı","Saimbeyli","Sarıçam","Seyhan","Tufanbeyli","Yumurtalık","Yüreğir"],"Adıyaman":["Adıyaman","Besni","Çelikhan","Gerger","Gölbaşı","Kahta","Samsat","Sincik","Tut"],"Afyonkarahisar":["Afyonkarahisar","Başmakçı","Bayat","Bolvadin","Çay","Çobanlar","Dazkırı","Dinar","Emirdağ","Evciler","Hocalar","İhsaniye","İscehisar","Kızılören","Sandıklı","Sinanpaşa","Sultandağı","Şuhut"],"Ağrı":["Ağrı","Diyadin","Doğubayazıt","Eleşkirt","Hamur","Patnos","Taşlıçay","Tutak"],"Aksaray":["Ağaçören","Aksaray","Eskil","Gülağaç","Güzelyurt","Ortaköy","Sarıyahşi","Sultanhanı"],"Amasya":["Amasya","Göynücek","Gümüşhacıköy","Hamamözü","Merzifon","Suluova","Taşova"],"Ankara":["Akyurt","Altındağ","Ayaş","Bala","Beypazarı","Çamlıdere","Çankaya","Çubuk","Elmadağ","Etimesgut","Evren","Gölbaşı","Güdül","Haymana","Kahramankazan","Kalecik","Keçiören","Kızılcahamam","Mamak","Nallıhan","Polatlı","Pursaklar","Sincan","Şereflikoçhisar","Yenimahalle"],"Antalya":["Akseki","Aksu","Alanya","Demre","Döşemealtı","Elmalı","Finike","Gazipaşa","Gündoğmuş","İbradı","Kaş","Kemer","Kepez","Konyaaltı","Korkuteli","Kumluca","Manavgat","Muratpaşa","Serik"],"Ardahan":["Ardahan","Çıldır","Damal","Göle","Hanak","Posof"],"Artvin":["Ardanuç","Arhavi","Artvin","Borçka","Hopa","Kemalpaşa","Murgul","Şavşat","Yusufeli"],"Aydın":["Bozdoğan","Buharkent","Çine","Didim","Efeler","Germencik","İncirliova","Karacasu","Karpuzlu","Koçarlı","Köşk","Kuşadası","Kuyucak","Nazilli","Söke","Sultanhisar","Yenipazar"],"Balıkesir":["Altıeylül","Ayvalık","Balya","Bandırma","Bigadiç","Burhaniye","Dursunbey","Edremit","Erdek","Gömeç","Gönen","Havran","İvrindi","Karesi","Kepsut","Manyas","Marmara","Savaştepe","Sındırgı","Susurluk"],"Bartın":["Amasra","Bartın","Kurucaşile","Ulus"],"Batman":["Batman","Beşiri","Gercüş","Hasankeyf","Kozluk","Sason"],"Bayburt":["Aydıntepe","Bayburt","Demirözü"],"Bilecik":["Bilecik","Bozüyük","Gölpazarı","İnhisar","Osmaneli","Pazaryeri","Söğüt","Yenipazar"],"Bingöl":["Adaklı","Bingöl","Genç","Karlıova","Kiğı","Solhan","Yayladere","Yedisu"],"Bitlis":["Adilcevaz","Ahlat","Bitlis","Güroymak","Hizan","Mutki","Tatvan"],"Bolu":["Bolu","Dörtdivan","Gerede","Göynük","Kıbrıscık","Mengen","Mudurnu","Seben","Yeniçağa"],"Burdur":["Ağlasun","Altınyayla","Bucak","Burdur","Çavdır","Çeltikçi","Gölhisar","Karamanlı","Kemer","Tefenni","Yeşilova"],"Bursa":["Büyükorhan","Gemlik","Gürsu","Harmancık","İnegöl","İznik","Karacabey","Keles","Kestel","Mudanya","Mustafakemalpaşa","Nilüfer","Orhaneli","Orhangazi","Osmangazi","Yenişehir","Yıldırım"],"Çanakkale":["Ayvacık","Bayramiç","Biga","Bozcaada","Çan","Çanakkale","Eceabat","Ezine","Gelibolu","Gökçeada","Lapseki","Yenice"],"Çankırı":["Atkaracalar","Bayramören","Çankırı","Çerkeş","Eldivan","Ilgaz","Kızılırmak","Korgun","Kurşunlu","Orta","Şabanözü","Yapraklı"],"Çorum":["Alaca","Bayat","Boğazkale","Çorum","Dodurga","İskilip","Kargı","Laçin","Mecitözü","Oğuzlar","Ortaköy","Osmancık","Sungurlu","Uğurludağ"],"Denizli":["Acıpayam","Babadağ","Baklan","Bekilli","Beyağaç","Bozkurt","Buldan","Çal","Çameli","Çardak","Çivril","Güney","Honaz","Kale","Merkezefendi","Pamukkale","Sarayköy","Serinhisar","Tavas"],"Diyarbakır":["Bağlar","Bismil","Çermik","Çınar","Çüngüş","Dicle","Eğil","Ergani","Hani","Hazro","Kayapınar","Kocaköy","Kulp","Lice","Silvan","Sur","Yenişehir"],"Düzce":["Akçakoca","Cumayeri","Çilimli","Düzce","Gölyaka","Gümüşova","Kaynaşlı","Yığılca"],"Edirne":["Edirne","Enez","Havsa","İpsala","Keşan","Lalapaşa","Meriç","Süloğlu","Uzunköprü"],"Elazığ":["Ağın","Alacakaya","Arıcak","Baskil","Elazığ","Karakoçan","Keban","Kovancılar","Maden","Palu","Sivrice"],"Erzincan":["Çayırlı","Erzincan","İliç","Kemah","Kemaliye","Otlukbeli","Refahiye","Tercan","Üzümlü"],"Erzurum":["Aşkale","Aziziye","Çat","Hınıs","Horasan","İspir","Karaçoban","Karayazı","Köprüköy","Narman","Oltu","Olur","Palandöken","Pasinler","Pazaryolu","Şenkaya","Tekman","Tortum","Uzundere","Yakutiye"],"Eskişehir":["Alpu","Beylikova","Çifteler","Günyüzü","Han","İnönü","Mahmudiye","Mihalgazi","Mihalıççık","Odunpazarı","Sarıcakaya","Seyitgazi","Sivrihisar","Tepebaşı"],"Gaziantep":["Araban","İslahiye","Karkamış","Nizip","Nurdağı","Oğuzeli","Şahinbey","Şehitkamil","Yavuzeli"],"Giresun":["Alucra","Bulancak","Çamoluk","Çanakçı","Dereli","Doğankent","Espiye","Eynesil","Giresun","Görele","Güce","Keşap","Piraziz","Şebinkarahisar","Tirebolu","Yağlıdere"],"Gümüşhane":["Gümüşhane","Kelkit","Köse","Kürtün","Şiran","Torul"],"Hakkari":["Çukurca","Derecik","Hakkari","Şemdinli","Yüksekova"],"Hatay":["Altınözü","Antakya","Arsuz","Belen","Defne","Dörtyol","Erzin","Hassa","İskenderun","Kırıkhan","Kumlu","Payas","Reyhanlı","Samandağ","Yayladağı"],"Iğdır":["Aralık","Iğdır","Karakoyunlu","Tuzluca"],"Isparta":["Aksu","Atabey","Eğirdir","Gelendost","Gönen","Isparta","Keçiborlu","Senirkent","Sütçüler","Şarkikaraağaç","Uluborlu","Yalvaç","Yenişarbademli"],"İzmir":["Aliağa","Balçova","Bayındır","Bayraklı","Bergama","Beydağ","Bornova","Buca","Çeşme","Çiğli","Dikili","Foça","Gaziemir","Güzelbahçe","Karabağlar","Karaburun","Karşıyaka","Kemalpaşa","Kınık","Kiraz","Konak","Menderes","Menemen","Narlıdere","Ödemiş","Seferihisar","Selçuk","Tire","Torbalı","Urla"],"Kahramanmaraş":["Afşin","Andırın","Çağlayancerit","Dulkadiroğlu","Ekinözü","Elbistan","Göksun","Nurhak","Onikişubat","Pazarcık","Türkoğlu"],"Karabük":["Eflani","Eskipazar","Karabük","Ovacık","Safranbolu","Yenice"],"Karaman":["Ayrancı","Başyayla","Ermenek","Karaman","Kazımkarabekir","Sarıveliler"],"Kars":["Akyaka","Arpaçay","Digor","Kağızman","Kars","Sarıkamış","Selim","Susuz"],"Kastamonu":["Abana","Ağlı","Araç","Azdavay","Bozkurt","Cide","Çatalzeytin","Daday","Devrekani","Doğanyurt","Hanönü","İhsangazi","İnebolu","Kastamonu","Küre","Pınarbaşı","Seydiler","Şenpazar","Taşköprü","Tosya"],"Kayseri":["Akkışla","Bünyan","Develi","Felahiye","Hacılar","İncesu","Kocasinan","Melikgazi","Özvatan","Pınarbaşı","Sarıoğlan","Sarız","Talas","Tomarza","Yahyalı","Yeşilhisar"],"Kırıkkale":["Bahşili","Balışeyh","Çelebi","Delice","Karakeçili","Keskin","Kırıkkale","Sulakyurt","Yahşihan"],"Kırklareli":["Babaeski","Demirköy","Kırklareli","Kofçaz","Lüleburgaz","Pehlivanköy","Pınarhisar","Vize"],"Kırşehir":["Akçakent","Akpınar","Boztepe","Çiçekdağı","Kaman","Kırşehir","Mucur"],"Kilis":["Elbeyli","Kilis","Musabeyli","Polateli"],"Kocaeli":["Başiskele","Çayırova","Darıca","Derince","Dilovası","Gebze","Gölcük","İzmit","Kandıra","Karamürsel","Kartepe","Körfez"],"Konya":["Ahırlı","Akören","Akşehir","Altınekin","Beyşehir","Bozkır","Cihanbeyli","Çeltik","Çumra","Derbent","Derebucak","Doğanhisar","Emirgazi","Ereğli","Güneysınır","Hadim","Halkapınar","Hüyük","Ilgın","Kadınhanı","Karapınar","Karatay","Kulu","Meram","Sarayönü","Selçuklu","Seydişehir","Taşkent","Tuzlukçu","Yalıhüyük","Yunak"],"Kütahya":["Altıntaş","Aslanapa","Çavdarhisar","Domaniç","Dumlupınar","Emet","Gediz","Hisarcık","Kütahya","Pazarlar","Simav","Şaphane","Tavşanlı"],"Malatya":["Akçadağ","Arapgir","Arguvan","Battalgazi","Darende","Doğanşehir","Doğanyol","Hekimhan","Kale","Kuluncak","Pütürge","Yazıhan","Yeşilyurt"],"Manisa":["Ahmetli","Akhisar","Alaşehir","Demirci","Gölmarmara","Gördes","Kırkağaç","Köprübaşı","Kula","Salihli","Sarıgöl","Saruhanlı","Selendi","Soma","Şehzadeler","Turgutlu","Yunusemre"],"Mardin":["Artuklu","Dargeçit","Derik","Kızıltepe","Mazıdağı","Midyat","Nusaybin","Ömerli","Savur","Yeşilli"],"Mersin":["Akdeniz","Anamur","Aydıncık","Bozyazı","Çamlıyayla","Erdemli","Gülnar","Mezitli","Mut","Silifke","Tarsus","Toroslar","Yenişehir"],"Muğla":["Bodrum","Dalaman","Datça","Fethiye","Kavaklıdere","Köyceğiz","Marmaris","Menteşe","Milas","Ortaca","Seydikemer","Ula","Yatağan"],"Muş":["Bulanık","Hasköy","Korkut","Malazgirt","Muş","Varto"],"Nevşehir":["Acıgöl","Avanos","Derinkuyu","Gülşehir","Hacıbektaş","Kozaklı","Nevşehir","Ürgüp"],"Niğde":["Altunhisar","Bor","Çamardı","Çiftlik","Niğde","Ulukışla"],"Ordu":["Akkuş","Altınordu","Aybastı","Çamaş","Çatalpınar","Çaybaşı","Fatsa","Gölköy","Gülyalı","Gürgentepe","İkizce","Kabadüz","Kabataş","Korgan","Kumru","Mesudiye","Perşembe","Ulubey","Ünye"],"Osmaniye":["Bahçe","Düziçi","Hasanbeyli","Kadirli","Osmaniye","Sumbas","Toprakkale"],"Rize":["Ardeşen","Çamlıhemşin","Çayeli","Derepazarı","Fındıklı","Güneysu","Hemşin","İkizdere","İyidere","Kalkandere","Pazar","Rize"],"Sakarya":["Adapazarı","Akyazı","Arifiye","Erenler","Ferizli","Geyve","Hendek","Karapürçek","Karasu","Kaynarca","Kocaali","Pamukova","Sapanca","Serdivan","Söğütlü","Taraklı"],"Samsun":["Alaçam","Asarcık","Atakum","Ayvacık","Bafra","Canik","Çarşamba","Havza","İlkadım","Kavak","Ladik","Salıpazarı","Tekkeköy","Terme","Vezirköprü","Yakakent","19 Mayıs"],"Siirt":["Baykan","Eruh","Kurtalan","Pervari","Siirt","Şirvan","Tillo"],"Sinop":["Ayancık","Boyabat","Dikmen","Durağan","Erfelek","Gerze","Saraydüzü","Sinop","Türkeli"],"Sivas":["Akıncılar","Altınyayla","Divriği","Doğanşar","Gemerek","Gölova","Gürün","Hafik","İmranlı","Kangal","Koyulhisar","Sivas","Suşehri","Şarkışla","Ulaş","Yıldızeli","Zara"],"Şanlıurfa":["Akçakale","Birecik","Bozova","Ceylanpınar","Eyyübiye","Halfeti","Haliliye","Harran","Hilvan","Karaköprü","Siverek","Suruç","Viranşehir"],"Şırnak":["Beytüşşebap","Cizre","Güçlükonak","İdil","Silopi","Şırnak","Uludere"],"Tekirdağ":["Çerkezköy","Çorlu","Ergene","Hayrabolu","Kapaklı","Malkara","Marmaraereğlisi","Muratlı","Saray","Süleymanpaşa","Şarköy"],"Tokat":["Almus","Artova","Başçiftlik","Erbaa","Niksar","Pazar","Reşadiye","Sulusaray","Tokat","Turhal","Yeşilyurt","Zile"],"Trabzon":["Akçaabat","Araklı","Arsin","Beşikdüzü","Çarşıbaşı","Çaykara","Dernekpazarı","Düzköy","Hayrat","Köprübaşı","Maçka","Of","Ortahisar","Sürmene","Şalpazarı","Tonya","Vakfıkebir","Yomra"],"Tunceli":["Çemişgezek","Hozat","Mazgirt","Nazımiye","Ovacık","Pertek","Pülümür","Tunceli"],"Uşak":["Banaz","Eşme","Karahallı","Sivaslı","Ulubey","Uşak"],"Van":["Bahçesaray","Başkale","Çaldıran","Çatak","Edremit","Erciş","Gevaş","Gürpınar","İpekyolu","Muradiye","Özalp","Saray","Tuşba"],"Yalova":["Altınova","Armutlu","Çınarcık","Çiftlikköy","Termal","Yalova"],"Yozgat":["Akdağmadeni","Aydıncık","Boğazlıyan","Çandır","Çayıralan","Çekerek","Kadışehri","Saraykent","Sarıkaya","Sorgun","Şefaatli","Yenifakılı","Yerköy","Yozgat"],"Zonguldak":["Alaplı","Çaycuma","Devrek","Ereğli","Gökçebey","Kilimli","Kozlu","Zonguldak"]};
+
+
 // Varsayılan senkron adresi: her yeni kurulumda otomatik dolu gelir, kimse elle yapıştırmak zorunda değil.
 const DEFAULT_SYNC_URL = "https://script.google.com/macros/s/AKfycbxy1TY3IuR4853r5fSHpZk-moaklMUZFwwEe600YRpY3WyCrya_XUmjSMvPrgGQYsU4/exec";
 
@@ -469,6 +506,7 @@ function goTo(view) {
 
 /* ---------------- Form state ---------------- */
 let formState = null;
+let editingId = null;
 function freshFormState() {
   const settings = getSettings();
   const answers = {};
@@ -476,6 +514,8 @@ function freshFormState() {
   return {
     kanal: "Macrocenter",
     magaza: "",
+    il: "",
+    ilce: "",
     sehir: "",
     tarih: todayStr(),
     temsilci: settings.defaultTemsilci || "",
@@ -486,6 +526,10 @@ function freshFormState() {
     aksiyonKim: "",
     aksiyonTarih: "",
   };
+}
+
+function recomputeSehir() {
+  formState.sehir = formState.il ? (formState.il + (formState.ilce ? " - " + formState.ilce : "")) : "";
 }
 
 function renderKanalPills() {
@@ -540,9 +584,48 @@ function renderAksiyonPills() {
   document.getElementById("aksiyonDetay").style.display = formState.aksiyonGerekli === "Evet" ? "block" : "none";
 }
 
+/* ---------------- Generic autocomplete ---------------- */
+function setupAutocomplete(inputId, panelId, getOptions, onSelect) {
+  const input = document.getElementById(inputId);
+  const panel = document.getElementById(panelId);
+
+  function renderList(list) {
+    panel.innerHTML = "";
+    if (!list.length) { panel.classList.remove("show"); return; }
+    list.slice(0, 8).forEach((opt) => {
+      const item = document.createElement("div");
+      item.className = "ac-item";
+      item.textContent = typeof opt === "string" ? opt : opt.label;
+      item.addEventListener("mousedown", (e) => { e.preventDefault(); });
+      item.addEventListener("click", () => {
+        const val = typeof opt === "string" ? opt : opt.value;
+        input.value = typeof opt === "string" ? opt : opt.label;
+        panel.classList.remove("show");
+        onSelect(val, opt);
+      });
+      panel.appendChild(item);
+    });
+    panel.classList.add("show");
+  }
+
+  function filterAndRender(q) {
+    const options = getOptions();
+    const needle = q.trim().toLocaleLowerCase("tr");
+    const matches = needle
+      ? options.filter((o) => (typeof o === "string" ? o : o.label).toLocaleLowerCase("tr").includes(needle))
+      : options;
+    renderList(matches);
+  }
+
+  input.addEventListener("input", () => {
+    onSelect(input.value, null);
+    filterAndRender(input.value);
+  });
+  input.addEventListener("focus", () => filterAndRender(input.value));
+  input.addEventListener("blur", () => setTimeout(() => panel.classList.remove("show"), 150));
+}
+
 function bindFormInputs() {
-  document.getElementById("f_magaza").oninput = (e) => (formState.magaza = e.target.value);
-  document.getElementById("f_sehir").oninput = (e) => (formState.sehir = e.target.value);
   document.getElementById("f_tarih").onchange = (e) => (formState.tarih = e.target.value);
   document.getElementById("f_temsilci").oninput = (e) => (formState.temsilci = e.target.value);
   document.getElementById("f_yetkili").oninput = (e) => (formState.yetkili = e.target.value);
@@ -552,11 +635,43 @@ function bindFormInputs() {
   document.querySelectorAll("#aksiyonPills .pill").forEach((p) => {
     p.onclick = () => { formState.aksiyonGerekli = p.dataset.v; renderAksiyonPills(); };
   });
+
+  setupAutocomplete(
+    "f_magaza", "ac_magaza",
+    () => (formState.kanal === "Macrocenter" ? MACROCENTER_STORES.map((s) => ({ label: s.name, value: s.name, il: s.il })) : []),
+    (val, opt) => {
+      formState.magaza = val;
+      if (opt && opt.il) {
+        formState.il = opt.il;
+        formState.ilce = "";
+        document.getElementById("f_il").value = opt.il;
+        document.getElementById("f_ilce").value = "";
+        recomputeSehir();
+      }
+    }
+  );
+
+  setupAutocomplete(
+    "f_il", "ac_il",
+    () => IL_LIST,
+    (val) => {
+      if (val !== formState.il) { formState.ilce = ""; document.getElementById("f_ilce").value = ""; }
+      formState.il = val;
+      recomputeSehir();
+    }
+  );
+
+  setupAutocomplete(
+    "f_ilce", "ac_ilce",
+    () => IL_ILCE[formState.il] || [],
+    (val) => { formState.ilce = val; recomputeSehir(); }
+  );
 }
 
 function loadFormIntoInputs() {
   document.getElementById("f_magaza").value = formState.magaza;
-  document.getElementById("f_sehir").value = formState.sehir;
+  document.getElementById("f_il").value = formState.il;
+  document.getElementById("f_ilce").value = formState.ilce;
   document.getElementById("f_tarih").value = formState.tarih;
   document.getElementById("f_temsilci").value = formState.temsilci;
   document.getElementById("f_yetkili").value = formState.yetkili;
@@ -569,13 +684,85 @@ function loadFormIntoInputs() {
 }
 
 function resetForm() {
+  editingId = null;
   formState = freshFormState();
   loadFormIntoInputs();
+  document.getElementById("editBanner").style.display = "none";
+  document.getElementById("saveBtn").textContent = "Ziyareti Kaydet";
+}
+
+function startEdit(id) {
+  const v = getVisits().find((x) => x.id === id);
+  if (!v) return;
+  editingId = id;
+  formState = {
+    kanal: v.kanal,
+    magaza: v.magaza,
+    il: v.il || "",
+    ilce: v.ilce || "",
+    sehir: v.sehir,
+    tarih: v.tarih,
+    temsilci: v.temsilci,
+    yetkili: v.yetkili,
+    answers: Object.assign({}, v.answers),
+    genelNot: v.genelNot,
+    aksiyonGerekli: v.aksiyonGerekli,
+    aksiyonKim: v.aksiyonKim,
+    aksiyonTarih: v.aksiyonTarih,
+  };
+  loadFormIntoInputs();
+  document.getElementById("editBanner").style.display = "flex";
+  document.getElementById("editBannerText").textContent = `"${v.magaza}" düzenleniyor`;
+  document.getElementById("saveBtn").textContent = "Değişiklikleri Kaydet";
+  goTo("form");
+}
+
+function cancelEdit() {
+  resetForm();
 }
 
 /* ---------------- Save + sync ---------------- */
 function evetSayisi(v) {
   return ALL_ITEMS.reduce((n, it) => n + (v.answers[it.key] === "Evet" ? 1 : 0), 0);
+}
+
+function captureLocation(timeoutMs) {
+  return new Promise((resolve) => {
+    if (!("geolocation" in navigator)) { resolve(null); return; }
+    let done = false;
+    const timer = setTimeout(() => { if (!done) { done = true; resolve(null); } }, timeoutMs || 6000);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
+        resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+      },
+      () => {
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
+        resolve(null);
+      },
+      { enableHighAccuracy: false, timeout: timeoutMs || 6000, maximumAge: 60000 }
+    );
+  });
+}
+
+async function attachLocation(id) {
+  const loc = await captureLocation(6000);
+  if (!loc) return;
+  const visits = getVisits();
+  const idx = visits.findIndex((v) => v.id === id);
+  if (idx === -1) return;
+  visits[idx].lat = loc.lat;
+  visits[idx].lng = loc.lng;
+  if (visits[idx].synced) {
+    visits[idx].synced = false;
+    visits[idx].syncAction = "update";
+  }
+  setVisits(visits);
+  trySyncOne(id);
 }
 
 async function saveVisit() {
@@ -584,18 +771,37 @@ async function saveVisit() {
     document.getElementById("f_magaza").focus();
     return;
   }
+  const visits = getVisits();
+
+  if (editingId) {
+    const idx = visits.findIndex((v) => v.id === editingId);
+    if (idx !== -1) {
+      visits[idx] = Object.assign({}, visits[idx], formState, { synced: false, syncAction: "update" });
+      setVisits(visits);
+      const idToSync = editingId;
+      showToast("Güncellendi");
+      resetForm();
+      updateSyncPill();
+      trySyncOne(idToSync);
+      return;
+    }
+  }
+
   const record = Object.assign({}, formState, {
     id: uid(),
     createdAt: new Date().toISOString(),
     synced: false,
+    syncAction: "create",
+    lat: null,
+    lng: null,
   });
-  const visits = getVisits();
   visits.unshift(record);
   setVisits(visits);
   showToast("Kaydedildi");
   updateSyncPill();
   resetForm();
   trySyncOne(record.id);
+  attachLocation(record.id);
 }
 
 async function trySyncOne(id) {
@@ -607,10 +813,11 @@ async function trySyncOne(id) {
   const record = visits[idx];
   if (record.synced) return;
   try {
+    const payload = Object.assign({}, record, { action: record.syncAction || "create" });
     const res = await fetch(settings.syncUrl, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(record),
+      body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error("HTTP " + res.status);
     record.synced = true;
@@ -622,21 +829,75 @@ async function trySyncOne(id) {
   updateSyncPill();
 }
 
+/* ---------------- Delete ---------------- */
+const LS_DELETE_QUEUE = "jnj_merch_delete_queue_v1";
+function getDeleteQueue() { return safeGet(LS_DELETE_QUEUE, []); }
+function setDeleteQueue(q) { safeSet(LS_DELETE_QUEUE, q); }
+
+function confirmDelete(id) {
+  const v = getVisits().find((x) => x.id === id);
+  const name = v ? v.magaza : "bu ziyaret";
+  if (!confirm(`"${name}" ziyaretini silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`)) return;
+  deleteVisit(id);
+}
+
+function deleteVisit(id) {
+  const visits = getVisits();
+  const idx = visits.findIndex((v) => v.id === id);
+  if (idx === -1) return;
+  const wasSynced = visits[idx].synced;
+  visits.splice(idx, 1);
+  setVisits(visits);
+  if (wasSynced) {
+    const q = getDeleteQueue();
+    if (!q.includes(id)) q.push(id);
+    setDeleteQueue(q);
+    trySyncDelete(id);
+  }
+  showToast("Silindi");
+  updateSyncPill();
+  renderHistory();
+}
+
+async function trySyncDelete(id) {
+  const settings = getSettings();
+  if (!settings.syncUrl) { updateSyncPill(); return; }
+  try {
+    const res = await fetch(settings.syncUrl, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "delete", id }),
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    setDeleteQueue(getDeleteQueue().filter((x) => x !== id));
+  } catch (e) {
+    // stays queued, retried later
+  }
+  updateSyncPill();
+}
+
+/* ---------------- Sync orchestration ---------------- */
+async function syncPendingQuiet() {
+  const settings = getSettings();
+  if (!settings.syncUrl) return;
+  for (const v of getVisits().filter((v) => !v.synced)) { await trySyncOne(v.id); }
+  for (const id of getDeleteQueue()) { await trySyncDelete(id); }
+  renderHistory();
+}
+
 async function syncAllPending() {
   const settings = getSettings();
   if (!settings.syncUrl) { showToast("Önce senkronizasyon adresi ayarlayın"); return; }
-  const visits = getVisits();
-  const pending = visits.filter((v) => !v.synced);
-  if (!pending.length) { showToast("Zaten hepsi senkronize"); return; }
-  showToast(`${pending.length} kayıt gönderiliyor...`);
-  for (const v of pending) { await trySyncOne(v.id); }
+  const totalPending = getVisits().filter((v) => !v.synced).length + getDeleteQueue().length;
+  if (!totalPending) { showToast("Zaten hepsi senkronize"); return; }
+  showToast(`${totalPending} kayıt gönderiliyor...`);
+  await syncPendingQuiet();
   showToast("Senkronizasyon tamam");
-  renderHistory();
 }
 
 function updateSyncPill() {
   const visits = getVisits();
-  const pending = visits.filter((v) => !v.synced).length;
+  const pending = visits.filter((v) => !v.synced).length + getDeleteQueue().length;
   const pill = document.getElementById("syncPill");
   const text = document.getElementById("syncPillText");
   if (pending === 0) {
@@ -699,6 +960,13 @@ function renderHistory() {
       <div class="visit-detail" id="detail-${v.id}"></div>
     `;
     card.addEventListener("click", (e) => {
+      const actBtn = e.target.closest("[data-act]");
+      if (actBtn) {
+        e.stopPropagation();
+        if (actBtn.dataset.act === "edit") startEdit(actBtn.dataset.id);
+        if (actBtn.dataset.act === "delete") confirmDelete(actBtn.dataset.id);
+        return;
+      }
       const detail = card.querySelector(".visit-detail");
       const willOpen = !detail.classList.contains("open");
       detail.classList.toggle("open", willOpen);
@@ -723,7 +991,15 @@ function renderDetailHtml(v) {
     ? `<div class="di-row"><span class="di-label">Kim</span><span class="di-val">${escapeHtml(v.aksiyonKim || "-")}</span></div>
        <div class="di-row"><span class="di-label">Ne zamana kadar</span><span class="di-val">${v.aksiyonTarih ? fmtDate(v.aksiyonTarih) : "-"}</span></div>`
     : "";
-  return `<div class="di-row"><span class="di-label">Saha Temsilcisi</span><span class="di-val">${escapeHtml(v.temsilci || "-")}</span></div>${yetkili}${rows}${aksiyon}${notes}`;
+  const konum = (v.lat != null && v.lng != null)
+    ? `<div class="di-row"><span class="di-label">Konum</span><span class="di-val"><a href="https://maps.google.com/?q=${v.lat},${v.lng}" target="_blank" rel="noopener" style="color:inherit;">Haritada gör</a></span></div>`
+    : "";
+  const actions = `
+    <div class="detail-actions">
+      <button type="button" class="btn" data-act="edit" data-id="${v.id}">Düzenle</button>
+      <button type="button" class="btn danger" data-act="delete" data-id="${v.id}">Sil</button>
+    </div>`;
+  return `<div class="di-row"><span class="di-label">Saha Temsilcisi</span><span class="di-val">${escapeHtml(v.temsilci || "-")}</span></div>${yetkili}${rows}${aksiyon}${notes}${konum}${actions}`;
 }
 
 function escapeHtml(s) {
@@ -734,12 +1010,12 @@ function escapeHtml(s) {
 function toCsv() {
   const head = ["Tarih","Kanal","Mağaza","Şehir","Temsilci","Yetkili"]
     .concat(ALL_ITEMS.map((it) => it.label))
-    .concat(["Evet Sayısı","Genel Notlar","Aksiyon Gerekli","Aksiyon Kim","Aksiyon Tarih","Senkron"]);
+    .concat(["Evet Sayısı","Genel Notlar","Aksiyon Gerekli","Aksiyon Kim","Aksiyon Tarih","Enlem","Boylam","Senkron"]);
   const lines = [head];
   getVisits().forEach((v) => {
     const row = [v.tarih, v.kanal, v.magaza, v.sehir, v.temsilci, v.yetkili]
       .concat(ALL_ITEMS.map((it) => v.answers[it.key] || ""))
-      .concat([evetSayisi(v) + "/22", v.genelNot, v.aksiyonGerekli, v.aksiyonKim, v.aksiyonTarih, v.synced ? "Evet" : "Hayır"]);
+      .concat([evetSayisi(v) + "/22", v.genelNot, v.aksiyonGerekli, v.aksiyonKim, v.aksiyonTarih, v.lat != null ? v.lat : "", v.lng != null ? v.lng : "", v.synced ? "Evet" : "Hayır"]);
     lines.push(row);
   });
   return lines.map((r) => r.map(csvCell).join(";")).join("\r\n");
