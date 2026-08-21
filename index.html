@@ -244,7 +244,21 @@
     border: none; background: rgba(0,0,0,0.62); color: #fff; font-size: 13px; line-height: 1; cursor: pointer;
   }
   .detail-photos { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-  .detail-photo-thumb { width: 68px; height: 68px; object-fit: cover; border-radius: 9px; border: 1px solid var(--border); display: block; }
+  .detail-photo-thumb { width: 68px; height: 68px; object-fit: cover; border-radius: 9px; border: 1px solid var(--border); display: block; cursor: pointer; }
+  .photo-cell img { cursor: pointer; }
+
+  .lightbox {
+    display: none; position: fixed; inset: 0; z-index: 100;
+    background: rgba(10,11,8,0.94);
+    align-items: center; justify-content: center;
+  }
+  .lightbox.show { display: flex; }
+  .lightbox img { max-width: 92vw; max-height: 82vh; border-radius: 10px; object-fit: contain; }
+  .lightbox-close {
+    position: absolute; top: calc(14px + env(safe-area-inset-top)); right: 16px;
+    width: 40px; height: 40px; border-radius: 50%; border: none;
+    background: rgba(255,255,255,0.15); color: #fff; font-size: 20px; line-height: 1; cursor: pointer;
+  }
 </style>
 </head>
 <body>
@@ -420,6 +434,10 @@
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="lightbox" id="photoLightbox">
+  <button type="button" class="lightbox-close" id="lightboxClose">×</button>
+  <img id="lightboxImg" src="" alt="Fotoğraf">
+</div>
 
 <script>
 "use strict";
@@ -595,6 +613,7 @@ function renderPhotoGrid() {
     cell.className = "photo-cell";
     const img = document.createElement("img");
     img.src = p.data || p.url;
+    img.addEventListener("click", () => openLightbox(p.data || p.url));
     const rm = document.createElement("button");
     rm.type = "button";
     rm.className = "photo-remove";
@@ -618,6 +637,16 @@ function updatePhotoHint() {
   hint.textContent = full
     ? MAX_PHOTOS + "/" + MAX_PHOTOS + " fotoğraf eklendi"
     : "Mağaza adı ve tarih fotoğrafın üzerine otomatik eklenir";
+}
+
+function openLightbox(src) {
+  if (!src) return;
+  document.getElementById("lightboxImg").src = src;
+  document.getElementById("photoLightbox").classList.add("show");
+}
+function closeLightbox() {
+  document.getElementById("photoLightbox").classList.remove("show");
+  document.getElementById("lightboxImg").src = "";
 }
 
 function bindPhotoInputs() {
@@ -1096,6 +1125,12 @@ function renderHistory() {
       <div class="visit-detail" id="detail-${v.id}"></div>
     `;
     card.addEventListener("click", (e) => {
+      const thumb = e.target.closest(".detail-photo-thumb");
+      if (thumb) {
+        e.stopPropagation();
+        openLightbox(thumb.dataset.src);
+        return;
+      }
       const actBtn = e.target.closest("[data-act]");
       if (actBtn) {
         e.stopPropagation();
@@ -1133,7 +1168,7 @@ function renderDetailHtml(v) {
   const fotograflar = (v.photos && v.photos.length)
     ? `<div class="detail-photos">` + v.photos.map((p) => {
         const src = p.data || p.url;
-        return src ? `<a href="${src}" target="_blank" rel="noopener"><img class="detail-photo-thumb" src="${src}"></a>` : "";
+        return src ? `<img class="detail-photo-thumb" data-src="${src}" src="${src}">` : "";
       }).join("") + `</div>`
     : "";
   const actions = `
@@ -1226,6 +1261,11 @@ document.getElementById("s_clearBtn").addEventListener("click", () => {
   showToast("Temizlendi");
   updateSyncPill();
   renderSettings();
+});
+
+document.getElementById("lightboxClose").addEventListener("click", closeLightbox);
+document.getElementById("photoLightbox").addEventListener("click", (e) => {
+  if (e.target.id === "photoLightbox") closeLightbox();
 });
 
 window.addEventListener("online", () => { syncAllPending(); });
