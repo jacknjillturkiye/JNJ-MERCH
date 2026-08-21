@@ -323,7 +323,7 @@
           <label for="s_syncUrl">Google Apps Script Web App URL</label>
           <input type="text" id="s_syncUrl" placeholder="https://script.google.com/macros/s/.../exec">
         </div>
-        <p class="hint">Kurulum talimatı sohbette verildi: Google Sheets → Uzantılar → Apps Script → kodu yapıştır → Web Uygulaması olarak yayınla → URL'yi buraya yapıştır.</p>
+        <p class="hint">Bu adres uygulamaya önceden tanımlı gelir, dokunmanıza gerek yok. Sadece farklı bir e-tabloya bağlamak isterseniz değiştirip Kaydet'e basın.</p>
         <button type="button" class="btn primary" id="saveSyncUrlBtn" style="margin-top:10px;">Kaydet</button>
       </section>
 
@@ -418,6 +418,9 @@ const CATEGORIES = [
 const ALL_ITEMS = CATEGORIES.flatMap((c) => c.items);
 const KANALLAR = ["Macrocenter", "Eczane", "Bebek Marketi", "Diğer"];
 
+// Varsayılan senkron adresi: her yeni kurulumda otomatik dolu gelir, kimse elle yapıştırmak zorunda değil.
+const DEFAULT_SYNC_URL = "https://script.google.com/macros/s/AKfycbxy1TY3IuR4853r5fSHpZk-moaklMUZFwwEe600YRpY3WyCrya_XUmjSMvPrgGQYsU4/exec";
+
 const LS_VISITS = "jnj_merch_visits_v1";
 const LS_SETTINGS = "jnj_merch_settings_v1";
 
@@ -433,7 +436,13 @@ function safeSet(key, val) {
 }
 function getVisits() { return safeGet(LS_VISITS, []); }
 function setVisits(v) { safeSet(LS_VISITS, v); }
-function getSettings() { return safeGet(LS_SETTINGS, { syncUrl: "", defaultTemsilci: "" }); }
+function getSettings() {
+  const s = safeGet(LS_SETTINGS, {});
+  return {
+    syncUrl: s.syncUrl || DEFAULT_SYNC_URL,
+    defaultTemsilci: s.defaultTemsilci || "",
+  };
+}
 function setSettings(s) { safeSet(LS_SETTINGS, s); }
 
 function uid() { return Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8); }
