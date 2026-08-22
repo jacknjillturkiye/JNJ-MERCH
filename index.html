@@ -945,7 +945,11 @@ async function saveVisit() {
   if (editingId) {
     const idx = visits.findIndex((v) => v.id === editingId);
     if (idx !== -1) {
-      visits[idx] = Object.assign({}, visits[idx], formState, { synced: false, syncAction: "update" });
+      visits[idx] = Object.assign({}, visits[idx], formState, {
+        synced: false,
+        syncAction: "update",
+        updatedAt: new Date().toISOString(),
+      });
       setVisits(visits);
       const idToSync = editingId;
       showToast("Güncellendi");
@@ -1036,6 +1040,7 @@ function forceResync(id) {
   visits[idx].synced = false;
   visits[idx].syncAction = "update";
   visits[idx].lastSyncError = null;
+  visits[idx].updatedAt = new Date().toISOString();
   setVisits(visits);
   updateSyncPill();
   showToast("Tekrar gönderiliyor...");
@@ -1148,9 +1153,25 @@ async function fetchRemoteVisits() {
 
 function getCombinedVisits() {
   const local = getVisits();
-  const localIds = new Set(local.map((v) => v.id));
-  const remoteOnly = remoteVisits.filter((v) => !localIds.has(v.id));
-  return local.concat(remoteOnly);
+  const merged = local.slice();
+  const localById = new Map(local.map((v) => [v.id, v]));
+
+  remoteVisits.forEach((rv) => {
+    const lv = localById.get(rv.id);
+    if (!lv) {
+      merged.push(rv);
+      return;
+    }
+    if (!lv.synced) return; // yerelde henüz gönderilmemiş bir değişiklik var, ona güveniyoruz
+    const lvTime = lv.updatedAt || lv.createdAt || "";
+    const rvTime = rv.createdAt || "";
+    if (rvTime > lvTime) {
+      const idx = merged.findIndex((m) => m.id === rv.id);
+      if (idx !== -1) merged[idx] = Object.assign({}, rv, { synced: true });
+    }
+  });
+
+  return merged;
 }
 
 /* ---------------- History view ---------------- */
