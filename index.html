@@ -116,10 +116,10 @@
   section.card h2 { font-size: 17px; font-weight: 800; margin-bottom: 12px; }
   .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
   .field:last-child { margin-bottom: 0; }
-  .field label { font-size: 12px; font-weight: 600; color: var(--ink-muted); }
+  .field label { font-size: 14px; font-weight: 800; color: var(--ink); }
   input[type="text"], input[type="date"], textarea, select {
-    background: var(--surface-2); border: 1px solid var(--border); border-radius: 9px;
-    padding: 10px 11px; font-size: 14.5px; width: 100%;
+    background: var(--surface-2); border: 1.5px solid var(--border-strong); border-radius: 10px;
+    padding: 12px; font-size: 15.5px; font-weight: 600; color: var(--ink); width: 100%;
   }
   textarea { resize: vertical; min-height: 60px; font-family: "Public Sans", sans-serif; }
 
@@ -128,7 +128,45 @@
     padding: 9px 14px; border-radius: 999px; border: 1px solid var(--border-strong);
     background: var(--surface-2); font-size: 13.5px; font-weight: 600; cursor: pointer;
   }
-  .pill.selected { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .pill.selected {
+    background: linear-gradient(100deg, var(--brand-teal), var(--brand-purple) 70%);
+    border-color: transparent; color: #fff; position: relative; overflow: hidden;
+  }
+  #kanalPills .pill:nth-child(1) { background: color-mix(in srgb, var(--brand-teal) 16%, var(--surface-2)); }
+  #kanalPills .pill:nth-child(2) { background: color-mix(in srgb, var(--brand-pink) 16%, var(--surface-2)); }
+  #kanalPills .pill:nth-child(3) { background: color-mix(in srgb, var(--brand-yellow) 24%, var(--surface-2)); }
+  #kanalPills .pill:nth-child(4) { background: color-mix(in srgb, var(--brand-purple) 16%, var(--surface-2)); }
+  #kanalPills .pill.selected::after {
+    content: ""; position: absolute; top: 0; left: -60%; width: 40%; height: 100%;
+    background: linear-gradient(100deg, transparent, rgba(255,255,255,0.55), transparent);
+    animation: pillSweep 2.6s ease-in-out infinite;
+  }
+  @keyframes pillSweep { 0% { left: -60%; } 60%, 100% { left: 130%; } }
+  @media (prefers-reduced-motion: reduce) { #kanalPills .pill.selected::after { animation: none; } }
+
+  .kanal-pill-wrap { position: relative; }
+  .kanal-mascot {
+    position: absolute; right: -4px; bottom: -16px; width: 44px; height: auto;
+    pointer-events: none; transform-origin: bottom center;
+    animation: mascotIdle 5s ease-in-out infinite;
+  }
+  @keyframes mascotIdle {
+    0%, 85%, 100% { transform: rotate(0deg) translateY(0); }
+    88% { transform: rotate(-7deg) translateY(-3px); }
+    91% { transform: rotate(6deg) translateY(-2px); }
+    94% { transform: rotate(-3deg) translateY(-3px); }
+    97% { transform: rotate(0deg) translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce) { .kanal-mascot { animation: none; } }
+
+  .animated-heading {
+    background: linear-gradient(110deg, var(--brand-teal), var(--brand-purple), var(--brand-pink), var(--brand-yellow), var(--brand-teal));
+    background-size: 300% 100%;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: headingShimmer 6s linear infinite;
+  }
+  @keyframes headingShimmer { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
+  @media (prefers-reduced-motion: reduce) { .animated-heading { animation: none; } }
 
   .cat-block { margin-bottom: 16px; }
   .cat-block:last-child { margin-bottom: 0; }
@@ -214,14 +252,20 @@
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
     max-width: 520px; margin: 0 auto;
     background: var(--surface); border-top: 1px solid var(--border);
-    display: flex; padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+    display: flex; padding: 5px 4px calc(5px + env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 18px -8px rgba(58,42,30,0.18);
   }
   nav.bottomnav button {
-    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
-    background: none; border: none; padding: 7px 4px; color: var(--ink-muted); cursor: pointer;
-    font-size: 11px; font-weight: 600; border-radius: 10px;
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+    background: none; border: none; padding: 7px 2px 6px; color: var(--ink-muted); cursor: pointer;
+    font-size: 9.5px; font-weight: 700; border-radius: 12px; transition: transform 0.1s ease;
   }
-  nav.bottomnav button.active { color: var(--accent); }
+  nav.bottomnav button:active { transform: scale(0.93); }
+  nav.bottomnav button.active {
+    color: var(--accent-ink);
+    background: linear-gradient(160deg, var(--accent-soft), var(--surface-2));
+  }
+  nav.bottomnav button.active svg { stroke: var(--brand-teal); }
   nav.bottomnav svg { width: 21px; height: 21px; }
 
   .badge { font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
@@ -232,6 +276,43 @@
 
   .filters { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
   .filters input, .filters select { flex: 1; min-width: 120px; }
+  .toggle-row { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; }
+  .toggle-row input[type="checkbox"] { width: 19px; height: 19px; accent-color: var(--accent); flex-shrink: 0; }
+
+  .segmented {
+    display: flex; gap: 6px; background: var(--surface-2); border-radius: 12px;
+    padding: 5px; margin-bottom: 14px;
+  }
+  .seg-btn {
+    flex: 1; border: none; background: none; padding: 10px 8px; border-radius: 9px;
+    font-size: 13px; font-weight: 700; color: var(--ink-muted); cursor: pointer;
+  }
+  .seg-btn.active {
+    background: linear-gradient(100deg, var(--brand-teal), var(--brand-purple) 70%);
+    color: #ffffff; box-shadow: var(--shadow);
+  }
+
+  .galeri-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .galeri-cell { position: relative; border-radius: 10px; overflow: hidden; aspect-ratio: 1; border: 1px solid var(--border); cursor: pointer; }
+  .galeri-cell img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .galeri-cell .galeri-cell-label {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 4px 6px;
+    background: linear-gradient(to top, rgba(0,0,0,0.72), transparent);
+    color: #fff; font-size: 9.5px; font-weight: 700; line-height: 1.2;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .store-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 13px 14px; margin-bottom: 10px; box-shadow: var(--shadow); cursor: pointer; }
+  .store-card .row1 { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .store-card .store-name { font-weight: 700; font-size: 14.5px; }
+  .store-card .store-meta { font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
+  .store-visits { display: none; margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
+  .store-visits.open { display: block; }
+  .store-visit-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 8px 0; border-top: 1px solid var(--border); font-size: 13px;
+  }
+  .store-visit-row:first-child { border-top: none; }
 
   .date-heading { font-size: 12px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .04em; margin: 16px 0 8px; }
   .date-heading:first-child { margin-top: 0; }
@@ -355,10 +436,13 @@
         <button type="button" onclick="cancelEdit()">İptal</button>
       </div>
       <section class="card">
-        <h2>Ziyaret Bilgileri</h2>
+        <h2 class="animated-heading">Ziyaret Bilgileri</h2>
         <div class="field">
           <label>Kanal</label>
-          <div class="pillrow" id="kanalPills"></div>
+          <div class="kanal-pill-wrap">
+            <div class="pillrow" id="kanalPills"></div>
+            <img src="./assets/character-dino.png" alt="" class="kanal-mascot">
+          </div>
         </div>
         <div class="field ac-wrap">
           <label for="f_magaza">Mağaza Adı</label>
@@ -422,8 +506,8 @@
         <div class="field">
           <label>Takip Aksiyonu Gerekiyor mu?</label>
           <div class="pillrow" id="aksiyonPills">
-            <div class="pill" data-v="Hayır">Hayır</div>
             <div class="pill" data-v="Evet">Evet</div>
+            <div class="pill" data-v="Hayır">Hayır</div>
           </div>
         </div>
         <div id="aksiyonDetay" style="display:none;">
@@ -453,12 +537,46 @@
             <option>Diğer</option>
           </select>
         </div>
+        <div class="toggle-row">
+          <input type="checkbox" id="h_onlyPending">
+          <label for="h_onlyPending" style="font-weight:600; font-size:13.5px;">Sadece takip bekleyenler</label>
+        </div>
         <div class="btn-row">
           <button type="button" class="btn" id="exportCsvBtn">Dışa Aktar (CSV)</button>
           <button type="button" class="btn" id="syncNowBtn">Şimdi Senkronize Et</button>
         </div>
       </section>
       <div id="historyList"></div>
+    </div>
+
+    <!-- ================= MAĞAZALAR ================= -->
+    <div class="view" id="view-magazalar">
+      <div class="segmented" id="magazalarSegment">
+        <button type="button" class="seg-btn active" data-seg="gezilen">Gezilen Mağazalar</button>
+        <button type="button" class="seg-btn" data-seg="gezilmeyen">Gezilmeyen Mağazalar</button>
+      </div>
+
+      <div id="magazalarGezilenPanel">
+        <section class="card">
+          <input type="text" id="mg_search" placeholder="Mağaza ara...">
+        </section>
+        <div id="magazalarGezilenList"></div>
+      </div>
+
+      <div id="magazalarGezilmeyenPanel" style="display:none;">
+        <section class="card">
+          <input type="text" id="mgu_search" placeholder="Mağaza ara...">
+        </section>
+        <div id="magazalarGezilmeyenList"></div>
+      </div>
+    </div>
+
+    <!-- ================= GALERİ ================= -->
+    <div class="view" id="view-galeri">
+      <section class="card">
+        <input type="text" id="galeriSearch" placeholder="Mağaza adına göre ara...">
+      </section>
+      <div class="galeri-grid" id="galeriGrid"></div>
     </div>
 
     <!-- ================= AYARLAR ================= -->
@@ -509,6 +627,14 @@
     <button type="button" class="nav-btn" data-view="history" onclick="goTo('history')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
       Geçmiş
+    </button>
+    <button type="button" class="nav-btn" data-view="magazalar" onclick="goTo('magazalar')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10V21h16V10"></path><path d="M2.5 10 4 4h16l1.5 6"></path><path d="M2.5 10a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0"></path><path d="M9.5 21v-6h5v6"></path></svg>
+      Mağazalar
+    </button>
+    <button type="button" class="nav-btn" data-view="galeri" onclick="goTo('galeri')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="14" height="14" rx="2"></rect><circle cx="8" cy="9" r="1.5"></circle><path d="M3 15l4-4 3 3 4-5 5 6"></path><path d="M20.5 8H21a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-.5"></path></svg>
+      Galeri
     </button>
     <button type="button" class="nav-btn" data-view="settings" onclick="goTo('settings')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1.04z"></path></svg>
@@ -623,6 +749,8 @@ function goTo(view) {
   document.getElementById("saveBar").style.display = view === "form" ? "flex" : "none";
   if (view === "history") renderHistory();
   if (view === "settings") renderSettings();
+  if (view === "magazalar") renderMagazalar();
+  if (view === "galeri") renderGaleri();
   window.scrollTo(0, 0);
 }
 
@@ -1278,6 +1406,153 @@ function scoreBadgeClass(n) {
   return "bad";
 }
 
+/* ---------------- Mağazalar (Gezilen / Gezilmeyen) ---------------- */
+function bindMagazalarSegment() {
+  document.querySelectorAll("#magazalarSegment .seg-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#magazalarSegment .seg-btn").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      const seg = btn.dataset.seg;
+      document.getElementById("magazalarGezilenPanel").style.display = seg === "gezilen" ? "block" : "none";
+      document.getElementById("magazalarGezilmeyenPanel").style.display = seg === "gezilmeyen" ? "block" : "none";
+    });
+  });
+}
+
+function renderMagazalar() {
+  renderGezilenMagazalar();
+  renderGezilmeyenMagazalar();
+  fetchRemoteVisits().then(() => { renderGezilenMagazalar(); renderGezilmeyenMagazalar(); });
+}
+
+function groupVisitsByStore() {
+  const groups = new Map();
+  getCombinedVisits().forEach((v) => {
+    const key = (v.magaza || "").trim();
+    if (!key) return;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(v);
+  });
+  return groups;
+}
+
+function renderGezilenMagazalar() {
+  const list = document.getElementById("magazalarGezilenList");
+  const search = (document.getElementById("mg_search").value || "").toLowerCase();
+  const groups = groupVisitsByStore();
+  let stores = Array.from(groups.entries()).filter(([name]) => name.toLowerCase().includes(search));
+  stores.sort((a, b) => a[0].localeCompare(b[0], "tr"));
+
+  list.innerHTML = "";
+  if (!stores.length) {
+    list.innerHTML = `<div class="empty-state"><img src="./assets/scene-koala.png" alt="" class="empty-state-art"><div>Henüz gezilen mağaza yok</div></div>`;
+    return;
+  }
+
+  stores.forEach(([name, visits]) => {
+    visits.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+    const latest = visits[0];
+    const latestScore = evetSayisi(latest);
+    const pendingCount = visits.filter((v) => v.aksiyonGerekli === "Evet").length;
+
+    const card = document.createElement("div");
+    card.className = "store-card";
+    card.innerHTML = `
+      <div class="row1">
+        <div>
+          <div class="store-name">${escapeHtml(name)}</div>
+          <div class="store-meta">${escapeHtml(latest.kanal || "-")} · ${visits.length} ziyaret</div>
+        </div>
+        <span class="badge ${scoreBadgeClass(latestScore)}">${latestScore}/22</span>
+      </div>
+      ${pendingCount ? `<div class="row2" style="margin-top:8px; display:flex; gap:6px;"><span class="badge warn">Takip Gerekli (${pendingCount})</span></div>` : ""}
+      <div class="store-visits"></div>
+    `;
+    card.addEventListener("click", () => {
+      const panel = card.querySelector(".store-visits");
+      const willOpen = !panel.classList.contains("open");
+      panel.classList.toggle("open", willOpen);
+      if (willOpen && !panel.dataset.rendered) {
+        panel.innerHTML = visits.map((v) => {
+          const s = evetSayisi(v);
+          return `<div class="store-visit-row">
+            <span>${fmtDate(v.tarih)}${v.temsilci ? " · " + escapeHtml(v.temsilci) : ""}${v.aksiyonGerekli === "Evet" ? ' · <span class="badge warn">Takip Gerekli</span>' : ""}</span>
+            <span class="badge ${scoreBadgeClass(s)}">${s}/22</span>
+          </div>`;
+        }).join("");
+        panel.dataset.rendered = "1";
+      }
+    });
+    list.appendChild(card);
+  });
+}
+
+function renderGezilmeyenMagazalar() {
+  const list = document.getElementById("magazalarGezilmeyenList");
+  const search = (document.getElementById("mgu_search").value || "").toLowerCase();
+  const visitedNames = new Set(Array.from(groupVisitsByStore().keys()).map((n) => n.toLowerCase()));
+
+  const master = []
+    .concat(MACROCENTER_STORES.map((s) => ({ name: s.name, il: s.il, kanal: "Macrocenter" })))
+    .concat(BEBEK_MARKETLER_STORES.map((s) => ({ name: s.name, il: s.il, kanal: "Bebek Marketler" })));
+
+  let unvisited = master.filter((s) => !visitedNames.has(s.name.toLowerCase()));
+  unvisited = unvisited.filter((s) => s.name.toLowerCase().includes(search));
+  unvisited.sort((a, b) => a.name.localeCompare(b.name, "tr"));
+
+  list.innerHTML = "";
+  if (!unvisited.length) {
+    list.innerHTML = `<div class="empty-state"><div>Tüm mağazalar en az bir kez gezilmiş</div></div>`;
+    return;
+  }
+  unvisited.forEach((s) => {
+    const card = document.createElement("div");
+    card.className = "store-card";
+    card.style.cursor = "default";
+    card.innerHTML = `
+      <div class="row1">
+        <div>
+          <div class="store-name">${escapeHtml(s.name)}</div>
+          <div class="store-meta">${escapeHtml(s.kanal)}${s.il ? " · " + escapeHtml(s.il) : ""}</div>
+        </div>
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+/* ---------------- Galeri ---------------- */
+function renderGaleri() {
+  renderGaleriGrid();
+  fetchRemoteVisits().then(renderGaleriGrid);
+}
+
+function renderGaleriGrid() {
+  const grid = document.getElementById("galeriGrid");
+  const search = (document.getElementById("galeriSearch").value || "").toLowerCase();
+  const items = [];
+  getCombinedVisits().forEach((v) => {
+    if (!v.magaza || !v.magaza.toLowerCase().includes(search)) return;
+    (v.photos || []).forEach((p) => {
+      const src = p.data || p.url;
+      if (src) items.push({ src, magaza: v.magaza, createdAt: v.createdAt || "" });
+    });
+  });
+  items.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+
+  grid.innerHTML = "";
+  if (!items.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><img src="./assets/scene-koala.png" alt="" class="empty-state-art"><div>Henüz fotoğraf yok</div></div>`;
+    return;
+  }
+  items.forEach((it) => {
+    const cell = document.createElement("div");
+    cell.className = "galeri-cell";
+    cell.innerHTML = `<img src="${it.src}" loading="lazy"><div class="galeri-cell-label">${escapeHtml(it.magaza)}</div>`;
+    cell.addEventListener("click", () => openLightbox(it.src));
+    grid.appendChild(cell);
+  });
+}
+
 function renderHistory() {
   renderHistoryList();
   checkLowScoreAlert();
@@ -1301,8 +1576,10 @@ function renderHistoryList() {
   const list = document.getElementById("historyList");
   const search = (document.getElementById("h_search").value || "").toLowerCase();
   const kanalFilter = document.getElementById("h_kanal").value;
+  const onlyPending = document.getElementById("h_onlyPending").checked;
   let visits = getCombinedVisits().filter((v) => (v.magaza || "").toLowerCase().includes(search));
   if (kanalFilter) visits = visits.filter((v) => v.kanal === kanalFilter);
+  if (onlyPending) visits = visits.filter((v) => v.aksiyonGerekli === "Evet");
   visits.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 
   list.innerHTML = "";
@@ -1459,11 +1736,16 @@ function showToast(text) {
 
 /* ---------------- Wire up ---------------- */
 document.getElementById("saveBtn").addEventListener("click", saveVisit);
-document.getElementById("h_search").addEventListener("input", renderHistory);
-document.getElementById("h_kanal").addEventListener("change", renderHistory);
+document.getElementById("h_search").addEventListener("input", renderHistoryList);
+document.getElementById("h_kanal").addEventListener("change", renderHistoryList);
+document.getElementById("h_onlyPending").addEventListener("change", renderHistoryList);
 document.getElementById("exportCsvBtn").addEventListener("click", exportCsv);
 document.getElementById("s_exportCsvBtn").addEventListener("click", exportCsv);
 document.getElementById("syncNowBtn").addEventListener("click", syncAllPending);
+bindMagazalarSegment();
+document.getElementById("mg_search").addEventListener("input", renderGezilenMagazalar);
+document.getElementById("mgu_search").addEventListener("input", renderGezilmeyenMagazalar);
+document.getElementById("galeriSearch").addEventListener("input", renderGaleriGrid);
 document.getElementById("saveSyncUrlBtn").addEventListener("click", () => {
   const s = getSettings();
   s.syncUrl = document.getElementById("s_syncUrl").value.trim();
@@ -1491,6 +1773,7 @@ document.getElementById("photoLightbox").addEventListener("click", (e) => {
 });
 
 window.addEventListener("online", () => { syncAllPending(); });
+setInterval(() => { syncPendingQuiet(); }, 3 * 60 * 1000); // arka planda periyodik otomatik yeniden deneme
 
 bindFormInputs();
 bindPhotoInputs();
