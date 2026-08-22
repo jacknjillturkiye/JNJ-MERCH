@@ -57,35 +57,15 @@
     --shadow: 0 1px 2px rgba(58,42,30,0.08), 0 8px 24px -12px rgba(58,42,30,0.22);
     color-scheme: light;
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #211508;
-      --surface: #2e2013;
-      --surface-2: #3b2a18;
-      --ink: #fdf3e4;
-      --ink-muted: #c9b8a0;
-      --border: #4a3a24;
-      --border-strong: #5c4930;
-      --accent: #3ed9ce;
-      --accent-ink: #b8f5f0;
-      --accent-soft: #1d3f3c;
-      --danger: #ff7a8a;
-      --danger-ink: #ffdde2;
-      --danger-soft: #4a1f26;
-      --warning: #ffcb61;
-      --warning-ink: #fff0ce;
-      --warning-soft: #4a3814;
-      --success: #6ee39a;
-      --success-ink: #dffbe8;
-      --success-soft: #1b3d28;
-      --brand-pink: #ff8fbb;
-      --brand-purple: #b48be0;
-      --brand-yellow: #ffd766;
-      --brand-teal: #3ed9ce;
-      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
-      color-scheme: dark;
-    }
-  }
+  /* Karanlık mod bilinçli olarak KAPALI — telefon ayarı ne olursa olsun uygulama
+     hep bu canlı/açık JNJ temasında sabit kalsın diye. Karanlık mod geri istenirse
+     aşağıdaki bloğu "@media (prefers-color-scheme: dark) { :root { ... } }" olarak geri açın:
+     --bg:#211508 --surface:#2e2013 --surface-2:#3b2a18 --ink:#fdf3e4 --ink-muted:#c9b8a0
+     --border:#4a3a24 --border-strong:#5c4930 --accent:#3ed9ce --accent-ink:#b8f5f0
+     --accent-soft:#1d3f3c --danger:#ff7a8a --danger-ink:#ffdde2 --danger-soft:#4a1f26
+     --warning:#ffcb61 --warning-ink:#fff0ce --warning-soft:#4a3814 --success:#6ee39a
+     --success-ink:#dffbe8 --success-soft:#1b3d28 --brand-pink:#ff8fbb --brand-purple:#b48be0
+     --brand-yellow:#ffd766 --brand-teal:#3ed9ce color-scheme:dark */
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; }
   body {
