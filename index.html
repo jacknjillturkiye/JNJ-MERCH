@@ -981,7 +981,15 @@ async function trySyncOne(id) {
       body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error("HTTP " + res.status);
-    const json = await res.json().catch(() => ({}));
+    const json = await res.json().catch(() => null);
+    if (!json || json.ok !== true) {
+      record.lastSyncError = (json && json.error) || "Bilinmeyen sunucu hatası";
+      visits[idx] = record;
+      setVisits(visits);
+      updateSyncPill();
+      return;
+    }
+    record.lastSyncError = null;
     if (json.photoUrls && json.photoUrls.length) {
       json.photoUrls.forEach((url, i) => {
         const targetIdx = pendingPhotoIdx[i];
@@ -1047,7 +1055,10 @@ async function trySyncDelete(id) {
       body: JSON.stringify({ action: "delete", id }),
     });
     if (!res.ok) throw new Error("HTTP " + res.status);
-    setDeleteQueue(getDeleteQueue().filter((x) => x !== id));
+    const json = await res.json().catch(() => null);
+    if (json && json.ok === true) {
+      setDeleteQueue(getDeleteQueue().filter((x) => x !== id));
+    }
   } catch (e) {
     // stays queued, retried later
   }
@@ -1216,12 +1227,15 @@ function renderDetailHtml(v) {
         return src ? `<img class="detail-photo-thumb" data-src="${src}" src="${src}">` : "";
       }).join("") + `</div>`
     : "";
+  const hataMesaji = v.lastSyncError
+    ? `<div class="notes" style="background:var(--danger-soft);color:var(--danger-ink);">Senkron hatası: ${escapeHtml(v.lastSyncError)}</div>`
+    : "";
   const actions = `
     <div class="detail-actions">
       <button type="button" class="btn" data-act="edit" data-id="${v.id}">Düzenle</button>
       <button type="button" class="btn danger" data-act="delete" data-id="${v.id}">Sil</button>
     </div>`;
-  return `<div class="di-row"><span class="di-label">Saha Temsilcisi</span><span class="di-val">${escapeHtml(v.temsilci || "-")}</span></div>${yetkili}${rows}${aksiyon}${notes}${konum}${fotograflar}${actions}`;
+  return `<div class="di-row"><span class="di-label">Saha Temsilcisi</span><span class="di-val">${escapeHtml(v.temsilci || "-")}</span></div>${yetkili}${rows}${aksiyon}${notes}${konum}${fotograflar}${hataMesaji}${actions}`;
 }
 
 function escapeHtml(s) {
