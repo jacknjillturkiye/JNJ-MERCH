@@ -837,14 +837,21 @@ function resetForm() {
 }
 
 function startEdit(id) {
-  const v = getVisits().find((x) => x.id === id);
+  const v = getCombinedVisits().find((x) => x.id === id);
   if (!v) return;
+  const local = getVisits();
+  if (!local.some((x) => x.id === id)) {
+    local.unshift(Object.assign({}, v, { synced: true }));
+    setVisits(local);
+  }
   editingId = id;
+  const il = v.il || (v.sehir ? v.sehir.split(" - ")[0] : "");
+  const ilce = v.ilce || (v.sehir && v.sehir.indexOf(" - ") !== -1 ? v.sehir.split(" - ").slice(1).join(" - ") : "");
   formState = {
     kanal: v.kanal,
     magaza: v.magaza,
-    il: v.il || "",
-    ilce: v.ilce || "",
+    il: il,
+    ilce: ilce,
     sehir: v.sehir,
     tarih: v.tarih,
     temsilci: v.temsilci,
@@ -999,24 +1006,31 @@ function getDeleteQueue() { return safeGet(LS_DELETE_QUEUE, []); }
 function setDeleteQueue(q) { safeSet(LS_DELETE_QUEUE, q); }
 
 function confirmDelete(id) {
-  const v = getVisits().find((x) => x.id === id);
+  const v = getCombinedVisits().find((x) => x.id === id);
   const name = v ? v.magaza : "bu ziyaret";
   if (!confirm(`"${name}" ziyaretini silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`)) return;
   deleteVisit(id);
 }
 
+function queueDelete(id) {
+  const q = getDeleteQueue();
+  if (!q.includes(id)) q.push(id);
+  setDeleteQueue(q);
+  trySyncDelete(id);
+}
+
 function deleteVisit(id) {
   const visits = getVisits();
   const idx = visits.findIndex((v) => v.id === id);
-  if (idx === -1) return;
-  const wasSynced = visits[idx].synced;
-  visits.splice(idx, 1);
-  setVisits(visits);
-  if (wasSynced) {
-    const q = getDeleteQueue();
-    if (!q.includes(id)) q.push(id);
-    setDeleteQueue(q);
-    trySyncDelete(id);
+  if (idx !== -1) {
+    const wasSynced = visits[idx].synced;
+    visits.splice(idx, 1);
+    setVisits(visits);
+    if (wasSynced) queueDelete(id);
+  } else {
+    // Başka bir cihazda oluşturulmuş, sadece Sheet'ten görülen bir kayıt
+    remoteVisits = remoteVisits.filter((v) => v.id !== id);
+    queueDelete(id);
   }
   showToast("Silindi");
   updateSyncPill();
@@ -1073,6 +1087,32 @@ function updateSyncPill() {
   }
 }
 
+/* ---------------- Shared history (Sheet'ten okuma) ---------------- */
+let remoteVisits = [];
+
+async function fetchRemoteVisits() {
+  const settings = getSettings();
+  if (!settings.syncUrl) return;
+  try {
+    const sep = settings.syncUrl.indexOf("?") === -1 ? "?" : "&";
+    const res = await fetch(settings.syncUrl + sep + "action=list");
+    if (!res.ok) return;
+    const json = await res.json();
+    if (json && json.ok && Array.isArray(json.visits)) {
+      remoteVisits = json.visits;
+    }
+  } catch (e) {
+    // offline / erişilemedi - en son bilinen önbellekle devam
+  }
+}
+
+function getCombinedVisits() {
+  const local = getVisits();
+  const localIds = new Set(local.map((v) => v.id));
+  const remoteOnly = remoteVisits.filter((v) => !localIds.has(v.id));
+  return local.concat(remoteOnly);
+}
+
 /* ---------------- History view ---------------- */
 function scoreBadgeClass(n) {
   if (n >= 18) return "ok";
@@ -1081,10 +1121,15 @@ function scoreBadgeClass(n) {
 }
 
 function renderHistory() {
+  renderHistoryList();
+  fetchRemoteVisits().then(renderHistoryList);
+}
+
+function renderHistoryList() {
   const list = document.getElementById("historyList");
   const search = (document.getElementById("h_search").value || "").toLowerCase();
   const kanalFilter = document.getElementById("h_kanal").value;
-  let visits = getVisits().filter((v) => v.magaza.toLowerCase().includes(search));
+  let visits = getCombinedVisits().filter((v) => (v.magaza || "").toLowerCase().includes(search));
   if (kanalFilter) visits = visits.filter((v) => v.kanal === kanalFilter);
   visits.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 
