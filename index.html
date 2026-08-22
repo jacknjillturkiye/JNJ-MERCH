@@ -16,50 +16,72 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
+  /* ESKİ (sade teal/kahve) TEMA — geri dönmek istenirse bu blok :root ve
+     @media (prefers-color-scheme: dark) içindeki değerlerle değiştirilsin:
+     LIGHT: --bg:#f5f4ef --surface:#ffffff --surface-2:#edebdd --ink:#22251e
+       --ink-muted:#66695c --border:#d9d5c4 --border-strong:#c3bea8
+       --accent:#2e6e6b --accent-ink:#16403e --accent-soft:#dceae8
+       --danger:#b23a2e --danger-ink:#7a2820 --danger-soft:#f6e1dc
+       --warning:#b9862b --warning-ink:#7a5a1c --warning-soft:#f3e7ce
+       --success:#3f7d4a --success-ink:#285530 --success-soft:#deebdd
+     DARK: --bg:#1a1c16 --surface:#24271f --surface-2:#2c3026 --ink:#ece9dd
+       --ink-muted:#a5a794 --border:#3a3e30 --border-strong:#4a4e3c
+       --accent:#5fa6a2 --accent-ink:#cdeae7 --accent-soft:#26403f
+       --danger:#e0776a --danger-ink:#ffe0da --danger-soft:#402720
+       --warning:#dcaa54 --warning-ink:#ffe9c2 --warning-soft:#3e3016
+       --success:#7cbb86 --success-ink:#dff3e0 --success-soft:#223a26 */
   :root {
-    --bg: #f5f4ef;
+    --bg: #fff8ee;
     --surface: #ffffff;
-    --surface-2: #edebdd;
-    --ink: #22251e;
-    --ink-muted: #66695c;
-    --border: #d9d5c4;
-    --border-strong: #c3bea8;
-    --accent: #2e6e6b;
-    --accent-ink: #16403e;
-    --accent-soft: #dceae8;
-    --danger: #b23a2e;
-    --danger-ink: #7a2820;
-    --danger-soft: #f6e1dc;
-    --warning: #b9862b;
-    --warning-ink: #7a5a1c;
-    --warning-soft: #f3e7ce;
-    --success: #3f7d4a;
-    --success-ink: #285530;
-    --success-soft: #deebdd;
-    --shadow: 0 1px 2px rgba(34,37,30,0.06), 0 8px 24px -12px rgba(34,37,30,0.18);
+    --surface-2: #ffefd6;
+    --ink: #3a2a1e;
+    --ink-muted: #8a7660;
+    --border: #f0dcb8;
+    --border-strong: #e2c290;
+    --accent: #16a89c;
+    --accent-ink: #0a5f57;
+    --accent-soft: #d7f5f0;
+    --danger: #ff5a6e;
+    --danger-ink: #9c1f30;
+    --danger-soft: #ffe1e6;
+    --warning: #ffb627;
+    --warning-ink: #8a5900;
+    --warning-soft: #fff1cc;
+    --success: #38b463;
+    --success-ink: #1f7a3c;
+    --success-soft: #dff6e6;
+    --brand-pink: #ff6fa5;
+    --brand-purple: #9b6fd6;
+    --brand-yellow: #ffc93c;
+    --brand-teal: #16a89c;
+    --shadow: 0 1px 2px rgba(58,42,30,0.08), 0 8px 24px -12px rgba(58,42,30,0.22);
     color-scheme: light;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #1a1c16;
-      --surface: #24271f;
-      --surface-2: #2c3026;
-      --ink: #ece9dd;
-      --ink-muted: #a5a794;
-      --border: #3a3e30;
-      --border-strong: #4a4e3c;
-      --accent: #5fa6a2;
-      --accent-ink: #cdeae7;
-      --accent-soft: #26403f;
-      --danger: #e0776a;
-      --danger-ink: #ffe0da;
-      --danger-soft: #402720;
-      --warning: #dcaa54;
-      --warning-ink: #ffe9c2;
-      --warning-soft: #3e3016;
-      --success: #7cbb86;
-      --success-ink: #dff3e0;
-      --success-soft: #223a26;
+      --bg: #211508;
+      --surface: #2e2013;
+      --surface-2: #3b2a18;
+      --ink: #fdf3e4;
+      --ink-muted: #c9b8a0;
+      --border: #4a3a24;
+      --border-strong: #5c4930;
+      --accent: #3ed9ce;
+      --accent-ink: #b8f5f0;
+      --accent-soft: #1d3f3c;
+      --danger: #ff7a8a;
+      --danger-ink: #ffdde2;
+      --danger-soft: #4a1f26;
+      --warning: #ffcb61;
+      --warning-ink: #fff0ce;
+      --warning-soft: #4a3814;
+      --success: #6ee39a;
+      --success-ink: #dffbe8;
+      --success-soft: #1b3d28;
+      --brand-pink: #ff8fbb;
+      --brand-purple: #b48be0;
+      --brand-yellow: #ffd766;
+      --brand-teal: #3ed9ce;
       --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
       color-scheme: dark;
     }
@@ -108,10 +130,10 @@
   .view.active { display: block; }
 
   section.card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-    padding: 16px; margin-bottom: 14px; box-shadow: var(--shadow);
+    background: var(--surface); border: 1px solid var(--border); border-radius: 18px;
+    padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow);
   }
-  section.card h2 { font-size: 14.5px; font-weight: 700; margin-bottom: 10px; }
+  section.card h2 { font-size: 17px; font-weight: 800; margin-bottom: 12px; }
   .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
   .field:last-child { margin-bottom: 0; }
   .field label { font-size: 12px; font-weight: 600; color: var(--ink-muted); }
@@ -131,21 +153,72 @@
   .cat-block { margin-bottom: 16px; }
   .cat-block:last-child { margin-bottom: 0; }
   .cat-title {
-    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
-    color: var(--accent-ink); background: var(--accent-soft); border-radius: 7px;
-    padding: 6px 10px; margin-bottom: 8px;
+    font-size: 13.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em;
+    color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    background: linear-gradient(100deg, var(--brand-teal), var(--brand-purple) 55%, var(--brand-pink));
+    border-radius: 10px; padding: 10px 13px; margin-bottom: 10px;
   }
-  .q-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 2px; border-top: 1px solid var(--border); }
+  .q-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 2px; border-top: 1px solid var(--border); }
   .q-row:first-of-type { border-top: none; }
-  .q-row .q-label { font-size: 13.5px; flex: 1; }
-  .yn { display: flex; border-radius: 9px; overflow: hidden; border: 1px solid var(--border-strong); flex-shrink: 0; }
+  .q-row .q-label { font-size: 14px; font-weight: 600; flex: 1; }
+  .yn { display: flex; border-radius: 11px; overflow: hidden; border: 1px solid var(--border-strong); flex-shrink: 0; }
   .yn button {
-    border: none; background: var(--surface-2); padding: 8px 13px; font-size: 12.5px; font-weight: 700;
-    cursor: pointer; min-width: 56px;
+    border: none; background: var(--surface-2); color: var(--ink-muted); padding: 11px 16px; font-size: 13px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: .03em; cursor: pointer; min-width: 66px;
+    transition: transform 0.08s ease;
   }
-  .yn button.evet.on { background: var(--success-soft); color: var(--success-ink); }
-  .yn button.hayir.on { background: var(--danger-soft); color: var(--danger-ink); }
+  .yn button:active { transform: scale(0.94); }
+  .yn button.evet.on {
+    background: var(--success); color: #ffffff;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.4), 0 0 14px 1px var(--success);
+  }
+  .yn button.hayir.on {
+    background: var(--danger); color: #ffffff;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.4), 0 0 14px 1px var(--danger);
+  }
   .yn button.evet { border-right: 1px solid var(--border-strong); }
+
+  .score-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 16px; padding: 14px 18px; border-radius: 14px;
+    background: var(--surface-2); border: 2px solid var(--border-strong);
+  }
+  .score-bar-label { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-muted); }
+  .score-bar-value { font-family: "IBM Plex Mono", monospace; font-size: 22px; font-weight: 800; }
+  .score-bar.ok { background: var(--success-soft); border-color: var(--success); }
+  .score-bar.ok .score-bar-value { color: var(--success-ink); }
+  .score-bar.warn { background: var(--warning-soft); border-color: var(--warning); }
+  .score-bar.warn .score-bar-value { color: var(--warning-ink); }
+  .score-bar.bad { background: var(--danger-soft); border-color: var(--danger); animation: scorePulse 1.1s ease-in-out infinite; }
+  .score-bar.bad .score-bar-value { color: var(--danger-ink); }
+  @keyframes scorePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,90,110,0.45); }
+    50% { box-shadow: 0 0 0 8px rgba(255,90,110,0); }
+  }
+  @media (prefers-reduced-motion: reduce) { .score-bar.bad { animation: none; } }
+
+  .photo-heading-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 4px; }
+  .photo-heading-mascot { width: 40px; height: auto; flex-shrink: 0; }
+  .photo-heading {
+    text-align: center; font-size: 20px;
+    background: linear-gradient(100deg, var(--brand-teal), var(--brand-purple) 55%, var(--brand-pink));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+
+  .alert-banner {
+    display: none; align-items: flex-start; gap: 10px;
+    background: var(--danger); color: #ffffff; border-radius: 12px;
+    padding: 12px 14px; margin: 0 16px 4px; font-size: 13px; font-weight: 600;
+    box-shadow: 0 4px 14px -4px rgba(255,90,110,0.6);
+  }
+  .alert-banner.show { display: flex; }
+  .alert-banner .alert-icon { font-size: 18px; line-height: 1; }
+  .alert-banner .alert-body { flex: 1; }
+  .alert-banner .alert-title { font-weight: 800; margin-bottom: 2px; }
+  .alert-banner button {
+    background: rgba(255,255,255,0.22); border: none; color: #fff; border-radius: 999px;
+    width: 22px; height: 22px; font-size: 13px; cursor: pointer; flex-shrink: 0;
+  }
 
   .save-bar {
     position: sticky; bottom: calc(64px + env(safe-area-inset-bottom)); z-index: 15;
@@ -198,8 +271,11 @@
   .visit-detail .di-val.hayir { color: var(--danger-ink); }
   .visit-detail .notes { margin-top: 8px; font-size: 13px; background: var(--surface-2); border-radius: 8px; padding: 8px 10px; }
 
-  .empty-state { text-align: center; padding: 40px 20px; color: var(--ink-muted); }
-  .empty-state svg { width: 40px; height: 40px; opacity: .5; margin-bottom: 10px; }
+  .empty-state { text-align: center; padding: 24px 20px 40px; color: var(--ink-muted); }
+  .empty-state-art { width: 180px; max-width: 60%; height: auto; margin-bottom: 12px; }
+
+  .settings-footer-art { display: flex; justify-content: center; margin-top: 4px; }
+  .settings-footer-art img { width: 100%; max-width: 320px; border-radius: 18px; box-shadow: var(--shadow); }
 
   .btn { border: 1px solid var(--border-strong); background: var(--surface); border-radius: 10px; padding: 11px 14px; font-weight: 700; font-size: 13.5px; cursor: pointer; width: 100%; }
   .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
@@ -214,6 +290,9 @@
   }
   .toast.show { opacity: 1; }
   .hint { font-size: 11.5px; color: var(--ink-muted); margin-top: 6px; }
+
+  .brand-logo-wrap { display: flex; justify-content: center; padding: 6px 0 14px; }
+  .brand-logo { max-width: 220px; width: 62%; height: auto; }
 
   .edit-banner {
     display: none; align-items: center; justify-content: space-between; gap: 10px;
@@ -275,10 +354,22 @@
     </div>
   </header>
 
+  <div class="alert-banner" id="alertBanner">
+    <span class="alert-icon">⚠️</span>
+    <div class="alert-body">
+      <div class="alert-title">Düşük puanlı mağaza var</div>
+      <div id="alertBannerText"></div>
+    </div>
+    <button type="button" id="alertBannerClose">×</button>
+  </div>
+
   <main>
 
     <!-- ================= YENİ ZİYARET ================= -->
     <div class="view active" id="view-form">
+      <div class="brand-logo-wrap">
+        <img src="./logo.png" alt="Jack N'Jill" class="brand-logo">
+      </div>
       <div class="edit-banner" id="editBanner">
         <span id="editBannerText"></span>
         <button type="button" onclick="cancelEdit()">İptal</button>
@@ -321,10 +412,17 @@
       <section class="card">
         <h2>Kontrol Listesi</h2>
         <div id="checklist"></div>
+        <div class="score-bar" id="scoreBar">
+          <span class="score-bar-label">Puan</span>
+          <span class="score-bar-value" id="scoreBarValue">0/22</span>
+        </div>
       </section>
 
       <section class="card">
-        <h2>Fotoğraflar</h2>
+        <div class="photo-heading-row">
+          <img src="./assets/character-giraffe.png" alt="" class="photo-heading-mascot">
+          <h2 class="photo-heading">📷 Fotoğraflar</h2>
+        </div>
         <div class="photo-grid" id="photoGrid"></div>
         <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none;">
         <input type="file" id="photoInputGallery" accept="image/*" style="display:none;">
@@ -371,7 +469,7 @@
             <option value="">Tüm Kanallar</option>
             <option>Macrocenter</option>
             <option>Eczane</option>
-            <option>Bebek Marketi</option>
+            <option>Bebek Marketler</option>
             <option>Diğer</option>
           </select>
         </div>
@@ -412,6 +510,9 @@
           <button type="button" class="btn danger" id="s_clearBtn">Tüm Verileri Temizle</button>
         </div>
       </section>
+      <div class="settings-footer-art">
+        <img src="./assets/scene-keypoints.png" alt="Jack N'Jill">
+      </div>
     </div>
 
   </main>
@@ -449,46 +550,47 @@
 /* ---------------- Data model ---------------- */
 const CATEGORIES = [
   { name: "Ürün Mevcudiyeti", items: [
-    { key: "q1", label: "Anlaşmalı ürünler rafta" },
-    { key: "q2", label: "Boş / stoksuz alan yok" },
-    { key: "q3", label: "Depo-raf tutarlı" },
+    { key: "q1", label: "Anlaşmalı Ürünler Rafta" },
+    { key: "q2", label: "Boş / Stoksuz Alan Yok" },
+    { key: "q3", label: "Depo-Raf Tutarlı" },
   ]},
   { name: "Fiyatlandırma", items: [
-    { key: "q4", label: "Fiyat etiketi var" },
-    { key: "q5", label: "Etiket güncel / doğru" },
-    { key: "q6", label: "Etiket okunur / temiz" },
+    { key: "q4", label: "Fiyat Etiketi Var" },
+    { key: "q5", label: "Etiket Güncel / Doğru" },
+    { key: "q6", label: "Etiket Okunur / Temiz" },
   ]},
   { name: "Görünürlük & Yerleşim", items: [
-    { key: "q7", label: "Göz hizası / erişilebilir" },
-    { key: "q8", label: "JNJ bloğu düzenli" },
-    { key: "q9", label: "Rakip bloklamamış" },
+    { key: "q7", label: "Göz Hizası / Erişilebilir" },
+    { key: "q8", label: "JNJ Bloğu Düzenli" },
+    { key: "q9", label: "Rakip Bloklamamış" },
   ]},
   { name: "Ürün & Ambalaj Durumu", items: [
-    { key: "q10", label: "Ambalaj sağlam" },
-    { key: "q11", label: "Toz / solma yok" },
-    { key: "q12", label: "SKT kontrol edildi" },
+    { key: "q10", label: "Ambalaj Sağlam" },
+    { key: "q11", label: "Toz / Solma Yok" },
+    { key: "q12", label: "SKT Kontrol Edildi" },
   ]},
   { name: "Teşhir Materyalleri", items: [
-    { key: "q13", label: "Shelf-talker yerinde" },
-    { key: "q14", label: "Standee konumlu" },
-    { key: "q15", label: "Çapraz teşhir değerlendirildi" },
+    { key: "q13", label: "Shelf-Talker Yerinde" },
+    { key: "q14", label: "Standee Konumlu" },
+    { key: "q15", label: "Çapraz Teşhir Değerlendirildi" },
   ]},
   { name: "Rakip Gözlemi", items: [
-    { key: "q16", label: "Rakip raf payı not edildi" },
-    { key: "q17", label: "Rakip fiyat/promosyon gözlemlendi" },
+    { key: "q16", label: "Rakip Raf Payı Not Edildi" },
+    { key: "q17", label: "Rakip Fiyat/Promosyon Gözlemlendi" },
   ]},
   { name: "Mağaza İlişkisi", items: [
-    { key: "q18", label: "Yetkili ile görüşüldü" },
-    { key: "q19", label: "Personel biliyor / öneriyor" },
-    { key: "q20", label: "Talep/şikayet not edildi" },
+    { key: "q18", label: "Yetkili İle Görüşüldü" },
+    { key: "q19", label: "Personel Biliyor / Öneriyor" },
+    { key: "q20", label: "Talep/Şikayet Not Edildi" },
   ]},
   { name: "Belgeleme", items: [
-    { key: "q21", label: "Foto çekildi" },
-    { key: "q22", label: "Gözlemler kaydedildi" },
+    { key: "q21", label: "Foto Çekildi" },
+    { key: "q22", label: "Gözlemler Kaydedildi" },
   ]},
 ];
 const ALL_ITEMS = CATEGORIES.flatMap((c) => c.items);
-const KANALLAR = ["Macrocenter", "Eczane", "Bebek Marketi", "Diğer"];
+const KANALLAR = ["Macrocenter", "Eczane", "Bebek Marketler", "Diğer"];
+const BEBEK_MARKETLER_STORES = [{"name":"KeyifBebesi Acarkent","il":"İstanbul"},{"name":"KeyifBebesi Akasya AVM","il":"İstanbul"},{"name":"KeyifBebesi Akbatı AVM","il":"İstanbul"},{"name":"KeyifBebesi Gordion AVM","il":"Ankara"},{"name":"KeyifBebesi Kanyon","il":"İstanbul"},{"name":"KeyifBebesi İstinyepark İzmir","il":"İzmir"},{"name":"MinyCenter Akasya","il":"İstanbul"},{"name":"MinyCenter Akmerkez","il":"İstanbul"},{"name":"MinyCenter Armada","il":"Ankara"},{"name":"MinyCenter Bağdat Caddesi","il":"İstanbul"},{"name":"MinyCenter City's İstanbul","il":"İstanbul"},{"name":"MinyCenter Forum İstanbul","il":"İstanbul"},{"name":"MinyCenter Mall Of İstanbul","il":"İstanbul"},{"name":"MinyCenter Merkez Ankara AVM","il":"Ankara"},{"name":"MinyCenter Palladium","il":"İstanbul"},{"name":"MinyCenter Sur Yapı Marka AVM","il":"Bursa"},{"name":"MinyCenter Tema World","il":"İstanbul"},{"name":"MinyCenter Terracity","il":"Antalya"},{"name":"MinyCenter Vadi İstanbul","il":"İstanbul"},{"name":"MinyCenter Zorlu","il":"İstanbul"},{"name":"MinyCenter İstinye Park","il":"İstanbul"},{"name":"MinyCenter İzmir Hilltown","il":"İzmir"},{"name":"MinyCenter İzmir İstinye Park","il":"İzmir"}];
 
 const MACROCENTER_STORES = [{"name":"A.konutları Şişli Macrocenter","il":"İstanbul"},{"name":"Acarkent Macrocenter","il":"İstanbul"},{"name":"Acıbadem İstanbul Macrocenter","il":"İstanbul"},{"name":"Agora Avm İzmir Macrocenter","il":"İzmir"},{"name":"Akasya İstanbul Macrocenter","il":"İstanbul"},{"name":"Akmerkez Macrocenter","il":"İstanbul"},{"name":"Akyarlar Bodrum Macrocenter S","il":"Muğla"},{"name":"Alacaatlı Çayyolu Macrocenter","il":"Ankara"},{"name":"Alaçatı Macrocenter S","il":"İzmir"},{"name":"Alaçatı Çeşme Macrocenter","il":"İzmir"},{"name":"Alkent Macrocenter","il":"İstanbul"},{"name":"Alleben Gaziantep Macrocenter","il":"Gaziantep"},{"name":"Alsancak Macrocenter","il":"İzmir"},{"name":"Altınoluk Macrocenter","il":"Balıkesir"},{"name":"Altınova Macrocenter","il":"Balıkesir"},{"name":"Aqua Florya Macrocenter","il":"İstanbul"},{"name":"Arcadium Ankara Macrocenter","il":"Ankara"},{"name":"Aspat Bodrum Macrocenter S","il":"Muğla"},{"name":"Atakule Macrocenter","il":"Ankara"},{"name":"Atakum Macrocenter","il":"Samsun"},{"name":"Ataköy Suit Macrocenter","il":"İstanbul"},{"name":"Atatürk Blv Didim Macrocenter","il":"Aydın"},{"name":"Ataşehir Wynhouse Macrocenter","il":"İstanbul"},{"name":"Ayvalık Macrocenter","il":"Balıkesir"},{"name":"B.evler 7.cd Macrocenter S","il":"Ankara"},{"name":"Bebek Macrocenter S","il":"İstanbul"},{"name":"Beysukent Macrocenter","il":"Ankara"},{"name":"Bitez Muğla Macrocenter","il":"Muğla"},{"name":"Bodrum Küçükbük Macrocenter","il":"Muğla"},{"name":"Bodrum Çamlık Macrocenter","il":"Muğla"},{"name":"Bornova Macrocenter","il":"İzmir"},{"name":"Bostanlı Macrocenter","il":"İzmir"},{"name":"Brand Atakent Macrocenter","il":"İstanbul"},{"name":"Brandium Ataşehir Macrocenter","il":"İstanbul"},{"name":"Brandvadi İstanbul Macrocenter","il":"İstanbul"},{"name":"Bulvar Beytepe Macrocenter","il":"Ankara"},{"name":"Bursa Balat Macrocenter","il":"Bursa"},{"name":"Cemil Topuzlu Macrocenter","il":"İstanbul"},{"name":"City`s Nişantaşı Macrocenter","il":"İstanbul"},{"name":"D-marin Didim Macrocenter","il":"Aydın"},{"name":"D-marin Göcek Macrocenter S","il":"Muğla"},{"name":"D-marin Turgutreis Macrocenter","il":"Muğla"},{"name":"Dalyan Çeşme Macrocenter","il":"İzmir"},{"name":"Demirlife Hadımköy Macrocenter","il":"İstanbul"},{"name":"Downtown Alanya Macrocenter","il":"Antalya"},{"name":"Effect Macrocenter","il":"Ankara"},{"name":"Erenköy Kadıköy Macrocenter","il":"İstanbul"},{"name":"Eskişehir Macrocenter","il":"Eskişehir"},{"name":"Evka 3 Bornova İzm Macrocenter","il":"İzmir"},{"name":"F.ayanoğlu Kadıköy Macrocenter","il":"İstanbul"},{"name":"Fethiye Muğla Macrocenter","il":"Muğla"},{"name":"Filistin Cd Ank Macrocenter S","il":"Ankara"},{"name":"Fulya Beşiktaş Macrocenter","il":"İstanbul"},{"name":"Galataport Beyoğlu Macrocenter","il":"İstanbul"},{"name":"Gayrettepe İst Macrocenter","il":"İstanbul"},{"name":"Gaziantep Macrocenter","il":"Gaziantep"},{"name":"Gop Uğur Mumcu Macrocenter","il":"Ankara"},{"name":"Grandpera Macrocenter S","il":"İstanbul"},{"name":"Göcek Macrocenter","il":"Muğla"},{"name":"Göktürk Macrocenter","il":"İstanbul"},{"name":"Güllük Milas Macrocenter S","il":"Muğla"},{"name":"Gümüşsuyu İstanbul Macrocenter","il":"İstanbul"},{"name":"Gündoğan Bodrum Macrocenter","il":"Muğla"},{"name":"Güzelbahçe Sahil Macrocenter","il":"İzmir"},{"name":"Güzelbahçe İzmir Macrocenter","il":"İzmir"},{"name":"Homemade Mobil Macrocenter","il":"İstanbul"},{"name":"K.pınar Diyarbakır Macrocenter","il":"Diyarbakır"},{"name":"Kalkan Kalamar Ant Macrocenter","il":"Antalya"},{"name":"Kanyon Macrocenter","il":"İstanbul"},{"name":"Kaplankaya Macrocenter","il":"Muğla"},{"name":"Karaburun İzmir Macrocenter S","il":"İzmir"},{"name":"Karşıyaka İzmir Macrocenter","il":"İzmir"},{"name":"Kavaklıdere Macrocenter","il":"Ankara"},{"name":"Kaşmir Eryaman Macrocenter S","il":"Ankara"},{"name":"Kemer Antalya Macrocenter","il":"Antalya"},{"name":"Kemer Country Macrocenter","il":"İstanbul"},{"name":"Keptur Döşemealtı Macrocenter","il":"Antalya"},{"name":"Konyaaltı Macrocenter","il":"Antalya"},{"name":"Koru Alacaatlı Macrocenter","il":"Ankara"},{"name":"Kozyatağı Macrocenter","il":"İstanbul"},{"name":"Koşuyolu Macrocenter","il":"İstanbul"},{"name":"Kumru Macrocenter","il":"Ankara"},{"name":"Kuruçeşme Macrocenter","il":"İstanbul"},{"name":"Kuşadası Marina Macrocenter","il":"Aydın"},{"name":"Küçükyalı Hilltown Macrocenter","il":"İstanbul"},{"name":"Lara Macrocenter","il":"Antalya"},{"name":"Liv Bahçeşehir Macrocenter","il":"İstanbul"},{"name":"Lusso Bornova Macrocenter","il":"İzmir"},{"name":"Mahall Bomonti İzm Macrocenter","il":"İzmir"},{"name":"Manavgat Antalya Macrocenter","il":"Antalya"},{"name":"Marin Alaçatı Macrocenter S","il":"İzmir"},{"name":"Marina 24 İstanbul Macrocenter","il":"İstanbul"},{"name":"Marina Mersin Macrocenter","il":"Mersin"},{"name":"Marmaris Marina Macrocenter","il":"Muğla"},{"name":"Marmaris Muğla Macrocenter","il":"Muğla"},{"name":"Mars Kocaeli Macrocenter","il":"Kocaeli"},{"name":"Maslak 1453 Macrocenter","il":"İstanbul"},{"name":"Maslak 42 Macrocenter","il":"İstanbul"},{"name":"Maslak Darkkitchen Macrocenter","il":"İstanbul"},{"name":"Mavibahçe İzmir Macrocenter","il":"İzmir"},{"name":"Maya Milas Macrocenter","il":"Muğla"},{"name":"Menteşe Muğla Macrocenter","il":"Muğla"},{"name":"Metrohome B.düzü Macrocenter","il":"İstanbul"},{"name":"Midtown Avm Bodrum Macrocenter","il":"Muğla"},{"name":"Mogan Gölbaşı Ank Macrocenter","il":"Ankara"},{"name":"Next Level Ankara Macrocenter","il":"Ankara"},{"name":"Nisbetiye On Macrocenter","il":"İstanbul"},{"name":"Nişantaşı Macrocenter","il":"İstanbul"},{"name":"Nokta Ankara Macrocenter","il":"Ankara"},{"name":"Oba Alanya Macrocenter S","il":"Antalya"},{"name":"One Tower Ankara Macrocenter","il":"Ankara"},{"name":"Ormanada Macrocenter","il":"İstanbul"},{"name":"Ormanköy İstanbul Macrocenter","il":"İstanbul"},{"name":"Oyak Dragos İst Macrocenter","il":"İstanbul"},{"name":"Paspatur Fethiye Macrocenter S","il":"Muğla"},{"name":"Piazza Maltepe Macrocenter","il":"İstanbul"},{"name":"Podyumpark Bursa Macrocenter","il":"Bursa"},{"name":"Prıme Avm Manisa Macrocenter","il":"Manisa"},{"name":"Riva İstanbul Macrocenter S","il":"İstanbul"},{"name":"Sahil Kuşadası Macrocenter","il":"Aydın"},{"name":"Saklıvadi İstanbul Macrocenter","il":"İstanbul"},{"name":"Sapanca Macrocenter","il":"Sakarya"},{"name":"Sasalı İzmir Macrocenter","il":"İzmir"},{"name":"Selimiye Macrocenter S","il":"Muğla"},{"name":"Suadıye İstanbul Macrocenter","il":"İstanbul"},{"name":"Tema World Macrocenter","il":"İstanbul"},{"name":"Terra City Antalya Macrocenter","il":"Antalya"},{"name":"Torba Bodrum Macrocenter S","il":"Muğla"},{"name":"Türkbükü Macrocenter","il":"Muğla"},{"name":"U.mumcu Blv Adana Macrocenter","il":"Adana"},{"name":"Uncalı Mh Antalya Macrocenter","il":"Antalya"},{"name":"Unıque Ümitköy Macrocenter S","il":"Ankara"},{"name":"Urla İzmir Macrocenter","il":"İzmir"},{"name":"Vadi İstanbul Macrocenter","il":"İstanbul"},{"name":"Van Macrocenter","il":"Van"},{"name":"Vega Center Ankara Macrocenter","il":"Ankara"},{"name":"Vesen Tuzla İst Macrocenter S","il":"İstanbul"},{"name":"Vitrin Macrocenter","il":"Ankara"},{"name":"Watergarden İst Macrocenter","il":"İstanbul"},{"name":"Yalıkavak Bodrum Macrocenter","il":"Muğla"},{"name":"Yalıkavak Geriş Macrocenter S","il":"Muğla"},{"name":"Yalıkavak Gökçebel Macrocenter","il":"Muğla"},{"name":"Yalıkavak Marina Macrocenter","il":"Muğla"},{"name":"Yaşamkent Macrocenter S","il":"Ankara"},{"name":"Yedimavi İstanbul Macrocenter","il":"İstanbul"},{"name":"Yeniköy Macrocenter","il":"İstanbul"},{"name":"Zekeriyaköy Macrocenter","il":"İstanbul"},{"name":"Zorlu Macrocenter","il":"İstanbul"},{"name":"Çanakkale Macrocenter","il":"Çanakkale"},{"name":"Çekmeköy Kasaba Macrocenter S","il":"İstanbul"},{"name":"Çekmeköy Macrocenter","il":"İstanbul"},{"name":"Çeşme Ardıç Macrocenter","il":"İzmir"},{"name":"Çeşme Ilıca Macrocenter","il":"İzmir"},{"name":"Çeşme Macrocenter","il":"İzmir"},{"name":"Çorlu Önerler Macrocenter","il":"Tekirdağ"},{"name":"Özlüce Nilüfer Macrocenter","il":"Bursa"},{"name":"İstinye Park Macrocenter","il":"İstanbul"},{"name":"İstinyepark İzmir Macrocenter","il":"İzmir"},{"name":"İstmarina Macrocenter","il":"İstanbul"},{"name":"Şile İstanbul Macrocenter","il":"İstanbul"}];
 const IL_LIST = ["İstanbul","Adana","Adıyaman","Afyonkarahisar","Ağrı","Aksaray","Amasya","Ankara","Antalya","Ardahan","Artvin","Aydın","Balıkesir","Bartın","Batman","Bayburt","Bilecik","Bingöl","Bitlis","Bolu","Burdur","Bursa","Çanakkale","Çankırı","Çorum","Denizli","Diyarbakır","Düzce","Edirne","Elazığ","Erzincan","Erzurum","Eskişehir","Gaziantep","Giresun","Gümüşhane","Hakkari","Hatay","Iğdır","Isparta","İzmir","Kahramanmaraş","Karabük","Karaman","Kars","Kastamonu","Kayseri","Kırıkkale","Kırklareli","Kırşehir","Kilis","Kocaeli","Konya","Kütahya","Malatya","Manisa","Mardin","Mersin","Muğla","Muş","Nevşehir","Niğde","Ordu","Osmaniye","Rize","Sakarya","Samsun","Siirt","Sinop","Sivas","Şanlıurfa","Şırnak","Tekirdağ","Tokat","Trabzon","Tunceli","Uşak","Van","Yalova","Yozgat","Zonguldak"];
@@ -734,6 +836,17 @@ function renderChecklist() {
     });
     box.appendChild(block);
   });
+  updateScoreBar();
+}
+
+const SCORE_ALERT_LIMIT = 10;
+
+function updateScoreBar() {
+  const n = ALL_ITEMS.reduce((acc, it) => acc + (formState.answers[it.key] === "Evet" ? 1 : 0), 0);
+  const bar = document.getElementById("scoreBar");
+  const val = document.getElementById("scoreBarValue");
+  val.textContent = n + "/22";
+  bar.className = "score-bar " + (n <= SCORE_ALERT_LIMIT ? "bad" : n <= 15 ? "warn" : "ok");
 }
 
 function renderAksiyonPills() {
@@ -797,7 +910,11 @@ function bindFormInputs() {
 
   setupAutocomplete(
     "f_magaza", "ac_magaza",
-    () => (formState.kanal === "Macrocenter" ? MACROCENTER_STORES.map((s) => ({ label: s.name, value: s.name, il: s.il })) : []),
+    () => {
+      if (formState.kanal === "Macrocenter") return MACROCENTER_STORES.map((s) => ({ label: s.name, value: s.name, il: s.il }));
+      if (formState.kanal === "Bebek Marketler") return BEBEK_MARKETLER_STORES.map((s) => ({ label: s.name, value: s.name, il: s.il }));
+      return [];
+    },
     (val, opt) => {
       formState.magaza = val;
       if (opt && opt.il) {
@@ -1183,7 +1300,21 @@ function scoreBadgeClass(n) {
 
 function renderHistory() {
   renderHistoryList();
-  fetchRemoteVisits().then(renderHistoryList);
+  checkLowScoreAlert();
+  fetchRemoteVisits().then(() => { renderHistoryList(); checkLowScoreAlert(); });
+}
+
+function checkLowScoreAlert() {
+  const low = getCombinedVisits().filter((v) => evetSayisi(v) <= SCORE_ALERT_LIMIT);
+  const banner = document.getElementById("alertBanner");
+  const text = document.getElementById("alertBannerText");
+  if (!low.length) { banner.classList.remove("show"); return; }
+  low.sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+  const names = low.slice(0, 3).map((v) => `${v.magaza} (${evetSayisi(v)}/22)`);
+  let msg = names.join(", ");
+  if (low.length > 3) msg += ` ve ${low.length - 3} mağaza daha`;
+  text.textContent = msg;
+  banner.classList.add("show");
 }
 
 function renderHistoryList() {
@@ -1197,7 +1328,7 @@ function renderHistoryList() {
   list.innerHTML = "";
   if (!visits.length) {
     list.innerHTML = `<div class="empty-state">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
+      <img src="./assets/scene-koala.png" alt="" class="empty-state-art">
       <div>Henüz kayıtlı ziyaret yok</div>
     </div>`;
     return;
@@ -1385,6 +1516,12 @@ bindFormInputs();
 bindPhotoInputs();
 resetForm();
 updateSyncPill();
+
+document.getElementById("alertBannerClose").addEventListener("click", () => {
+  document.getElementById("alertBanner").classList.remove("show");
+});
+checkLowScoreAlert();
+fetchRemoteVisits().then(checkLowScoreAlert);
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
