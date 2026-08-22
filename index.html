@@ -327,7 +327,11 @@
         <h2>Fotoğraflar</h2>
         <div class="photo-grid" id="photoGrid"></div>
         <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none;">
-        <button type="button" class="btn" id="addPhotoBtn">+ Fotoğraf Ekle</button>
+        <input type="file" id="photoInputGallery" accept="image/*" style="display:none;">
+        <div class="btn-row">
+          <button type="button" class="btn" id="addPhotoBtn">+ Fotoğraf Çek</button>
+          <button type="button" class="btn" id="uploadPhotoBtn">+ Fotoğraf Yükle</button>
+        </div>
         <p class="hint" id="photoHint">Mağaza adı ve tarih fotoğrafın üzerine otomatik eklenir</p>
       </section>
 
@@ -630,11 +634,10 @@ function renderPhotoGrid() {
 }
 
 function updatePhotoHint() {
-  const btn = document.getElementById("addPhotoBtn");
-  const hint = document.getElementById("photoHint");
   const full = formState.photos.length >= MAX_PHOTOS;
-  btn.style.display = full ? "none" : "block";
-  hint.textContent = full
+  document.getElementById("addPhotoBtn").style.display = full ? "none" : "block";
+  document.getElementById("uploadPhotoBtn").style.display = full ? "none" : "block";
+  document.getElementById("photoHint").textContent = full
     ? MAX_PHOTOS + "/" + MAX_PHOTOS + " fotoğraf eklendi"
     : "Mağaza adı ve tarih fotoğrafın üzerine otomatik eklenir";
 }
@@ -649,25 +652,38 @@ function closeLightbox() {
   document.getElementById("lightboxImg").src = "";
 }
 
+async function handlePhotoFile(file) {
+  if (!file) return;
+  if (formState.photos.length >= MAX_PHOTOS) return;
+  const label = [formState.magaza, formState.tarih ? fmtDate(formState.tarih) : ""].filter(Boolean).join(" · ");
+  try {
+    const dataUri = await compressImage(file, 1000, 0.65, label);
+    formState.photos.push({ data: dataUri, url: null });
+    renderPhotoGrid();
+    updatePhotoHint();
+  } catch (err) {
+    showToast("Fotoğraf işlenemedi");
+  }
+}
+
 function bindPhotoInputs() {
   document.getElementById("addPhotoBtn").addEventListener("click", () => {
     if (!formState.magaza.trim()) { showToast("Önce mağaza adını girin"); return; }
     document.getElementById("photoInput").click();
   });
-  document.getElementById("photoInput").addEventListener("change", async (e) => {
+  document.getElementById("uploadPhotoBtn").addEventListener("click", () => {
+    if (!formState.magaza.trim()) { showToast("Önce mağaza adını girin"); return; }
+    document.getElementById("photoInputGallery").click();
+  });
+  document.getElementById("photoInput").addEventListener("change", (e) => {
     const file = e.target.files[0];
     e.target.value = "";
-    if (!file) return;
-    if (formState.photos.length >= MAX_PHOTOS) return;
-    const label = [formState.magaza, formState.tarih ? fmtDate(formState.tarih) : ""].filter(Boolean).join(" · ");
-    try {
-      const dataUri = await compressImage(file, 1000, 0.65, label);
-      formState.photos.push({ data: dataUri, url: null });
-      renderPhotoGrid();
-      updatePhotoHint();
-    } catch (err) {
-      showToast("Fotoğraf işlenemedi");
-    }
+    handlePhotoFile(file);
+  });
+  document.getElementById("photoInputGallery").addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    e.target.value = "";
+    handlePhotoFile(file);
   });
 }
 
