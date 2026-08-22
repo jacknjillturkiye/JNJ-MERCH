@@ -1013,6 +1013,19 @@ const LS_DELETE_QUEUE = "jnj_merch_delete_queue_v1";
 function getDeleteQueue() { return safeGet(LS_DELETE_QUEUE, []); }
 function setDeleteQueue(q) { safeSet(LS_DELETE_QUEUE, q); }
 
+function forceResync(id) {
+  const visits = getVisits();
+  const idx = visits.findIndex((v) => v.id === id);
+  if (idx === -1) { showToast("Bu kayıt bu cihazda yok"); return; }
+  visits[idx].synced = false;
+  visits[idx].syncAction = "update";
+  visits[idx].lastSyncError = null;
+  setVisits(visits);
+  updateSyncPill();
+  showToast("Tekrar gönderiliyor...");
+  trySyncOne(id).then(() => renderHistory());
+}
+
 function confirmDelete(id) {
   const v = getCombinedVisits().find((x) => x.id === id);
   const name = v ? v.magaza : "bu ziyaret";
@@ -1192,6 +1205,7 @@ function renderHistoryList() {
         e.stopPropagation();
         if (actBtn.dataset.act === "edit") startEdit(actBtn.dataset.id);
         if (actBtn.dataset.act === "delete") confirmDelete(actBtn.dataset.id);
+        if (actBtn.dataset.act === "resync") forceResync(actBtn.dataset.id);
         return;
       }
       const detail = card.querySelector(".visit-detail");
@@ -1233,6 +1247,7 @@ function renderDetailHtml(v) {
   const actions = `
     <div class="detail-actions">
       <button type="button" class="btn" data-act="edit" data-id="${v.id}">Düzenle</button>
+      <button type="button" class="btn" data-act="resync" data-id="${v.id}">Tekrar Gönder</button>
       <button type="button" class="btn danger" data-act="delete" data-id="${v.id}">Sil</button>
     </div>`;
   return `<div class="di-row"><span class="di-label">Saha Temsilcisi</span><span class="di-val">${escapeHtml(v.temsilci || "-")}</span></div>${yetkili}${rows}${aksiyon}${notes}${konum}${fotograflar}${hataMesaji}${actions}`;
